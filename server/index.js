@@ -167,6 +167,23 @@ app.post("/api/agents/workflow", async (req, res) => {
 
 app.post("/api/agents/assessment", async (req, res) => {
   const profile = req.body.profile || {};
+  const requiredFields = {
+    year: "Current year / stage",
+    interests: "Legal interests",
+    skills: "Current skills",
+    activities: "Activities / experience",
+    environment: "Preferred working environment",
+    geography: "Geographic preference"
+  };
+  const missingFields = Object.entries(requiredFields)
+    .filter(([key]) => !String(profile[key] ?? "").trim())
+    .map(([, label]) => label);
+  if (missingFields.length) {
+    return res.status(400).json({
+      error: "Please complete the required profile fields before running the assessment: " + missingFields.join(", ") + "."
+    });
+  }
+
   try {
     const research = await researchAgent({ records: [] });
     log("Research Agent", research.status, { count: research.count });
