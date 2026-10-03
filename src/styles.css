@@ -45,3 +45,39 @@
 .assessmentGrid{display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);gap:17px;align-items:start}.assessmentForm,.assessmentResult{background:#fff;border:1px solid #e2e7ed;border-radius:17px;padding:24px}.assessmentForm>label{display:block;font-size:10px;font-weight:800;color:#53647b;margin:0 0 7px}.assessmentForm input:not([type="range"]),.assessmentForm select,.assessmentForm textarea{width:100%;border:1px solid #dce2e9;border-radius:9px;padding:11px 12px;font:inherit;font-size:12px;outline:0;margin-bottom:15px;background:#fff;color:#34455c}.assessmentForm textarea{min-height:82px;resize:vertical}.assessmentForm input:not([type="range"]):focus,.assessmentForm select:focus,.assessmentForm textarea:focus{border-color:#b99d63;box-shadow:0 0 0 3px #f5f0e7}.rangeGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}.rangeGrid>label{padding:11px;border:1px solid #e3e8ee;border-radius:10px;font-size:10px;font-weight:750;color:#5c6c82}.rangeValue{display:flex;align-items:center;gap:8px;margin-top:8px}.rangeValue input{width:100%}.rangeValue b{font-size:9px;color:#9a8253;white-space:nowrap}.resultLead{font-size:11px!important;line-height:1.6;color:#7b8798}.hypothesis{width:100%;display:flex;gap:14px;align-items:flex-start;text-align:left;border:1px solid #e3e8ee;background:#fff;border-radius:12px;padding:15px;margin-top:9px;color:#34455c;cursor:pointer;transition:.18s}.hypothesis:hover{border-color:#cdb27d;transform:translateY(-1px);box-shadow:0 7px 20px rgba(22,38,61,.05)}.hypothesisBody{min-width:0;flex:1}.hypothesisTop{display:flex;align-items:center;gap:8px}.hypothesisTop b{font-size:12px;color:#23344c}.rank{font-size:9px;color:#b79b62;font-weight:900}.signalBadge{margin-left:auto;padding:4px 7px;border-radius:999px;background:#f1eee7;color:#876f42;font-size:8px;font-weight:800;white-space:nowrap}.hypothesis p{font-size:10px!important;line-height:1.5;color:#6e7d91;margin:7px 0}.signalGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.signalGrid>div{background:#f7f8fa;border-radius:8px;padding:8px}.signalGrid small,.evidence small{display:block;font-size:7px;letter-spacing:.8px;font-weight:900;color:#9a8253;margin-bottom:3px}.signalGrid span{font-size:9px;line-height:1.45;color:#627188}.evidence{display:flex;gap:6px;margin-top:9px;padding-top:8px;border-top:1px solid #edf0f4;color:#768398;font-size:8px;line-height:1.45}.evidence svg{color:#b08e51;flex-shrink:0;margin-top:1px}.roadmapBox{margin-top:15px;padding:17px;border:1px solid #d9dfE6;border-radius:13px;background:linear-gradient(180deg,#fbfaf7,#fff)}.roadmapHead h4{display:flex;align-items:center;gap:6px;margin:5px 0 2px;font-size:15px;color:#26374f}.roadmapHead h4 svg{color:#a3844d}.roadmapHead p{margin:0;font-size:10px;color:#7d899a}.coachRole{display:flex;gap:7px;align-items:flex-start;margin:13px 0;padding:9px 10px;background:#f1f4f7;border-radius:8px;color:#63738a;font-size:9px;line-height:1.5}.coachRole svg{color:#9b8250;flex-shrink:0}.roadmapBox>p{font-size:9px!important;line-height:1.6}.roadmapBox>p b{font-size:8px;letter-spacing:.7px;color:#8d7548}.roadSteps{display:grid;gap:7px;margin-top:10px}.roadStep{display:flex;gap:10px;align-items:flex-start;padding:9px;background:#fff;border:1px solid #e7ebef;border-radius:8px;font-size:10px;color:#53647a;line-height:1.45}.roadStep>span{font-size:8px;color:#b28f51;font-weight:900;padding-top:2px}.roadStep small{display:block;font-size:7px;letter-spacing:.7px;color:#9a8253;font-weight:900;margin-bottom:2px}.errorBox{background:#fbefed;color:#8a5b55}.emptyState{padding:45px 20px;text-align:center;background:#fff;border:1px dashed #d9e0e8;border-radius:14px;color:#7a8799}.emptyState svg{color:#b59b68;margin-bottom:8px}.emptyState b,.emptyState span{display:block}.emptyState b{font-size:12px;color:#52637a}.emptyState span{font-size:10px;margin-top:4px}
 @media(max-width:900px){.assessmentGrid{grid-template-columns:1fr}.assessmentIntro{display:block}.journey{margin-top:15px;width:max-content}.assessmentResult{order:-1}.headerStatus{display:none}}
 @media(max-width:620px){.assessmentForm,.assessmentResult{padding:17px}.rangeGrid,.signalGrid{grid-template-columns:1fr}.hypothesisTop{align-items:flex-start}.signalBadge{margin-left:0}.journey{width:100%;justify-content:space-between}.journey span{flex:1;text-align:center}}
+
+
+/* Readability + result flow polish */
+.assessmentForm>label{font-size:12px;margin-bottom:8px}
+.assessmentForm input:not([type="range"]),.assessmentForm select,.assessmentForm textarea{font-size:13px;padding:12px 13px}
+.assessmentForm textarea{min-height:92px}
+.formSection b{font-size:13px}
+.formSection small{font-size:10px}
+.assessmentResult{min-height:520px}
+.resultLead{font-size:12px!important}
+.resultStatus b{font-size:12px}
+.resultStatus span{font-size:11px}
+.hypothesis{padding:17px;margin-top:11px}
+.hypothesisTop b{font-size:13px}
+.hypothesis p{font-size:11px!important}
+.signalGrid small,.evidence small{font-size:8px}
+.signalGrid span{font-size:10px}
+.evidence{font-size:9px}
+.resultScrollCue{display:flex;align-items:center;justify-content:center;gap:8px;margin:16px 0 2px;padding:10px 12px;border:1px dashed #d5dce5;border-radius:9px;background:#f8fafb;color:#738196;font-size:10px;font-weight:750}
+.resultScrollCue svg{color:#a3844d}
+.roadmapBox{scroll-margin-top:110px}
+.roadmapHead h4{font-size:17px}
+.roadmapHead p{font-size:11px}
+.coachRole{font-size:10px}
+.roadmapBox>p{font-size:10px!important}
+.roadStep{font-size:11px;padding:11px}
+.roadStep small{font-size:8px}
+
+@media(max-width:900px){
+ .assessmentResult{min-height:auto}
+}
+@media(max-width:620px){
+ .assessmentForm>label{font-size:11px}
+ .assessmentForm input:not([type="range"]),.assessmentForm select,.assessmentForm textarea{font-size:13px}
+ .resultScrollCue{font-size:9px}
+}
