@@ -210,6 +210,13 @@ app.post("/api/agents/assessment", async (req, res) => {
     const matching = matchingAgent(profile, []);
     log("Opportunity Matching Agent", matching.status, { count: matching.matches.length });
 
+    // The fifth agent now runs as part of the assessment itself.
+    // It uses the strongest exploration hypothesis as the initial experiment,
+    // while the UI can still rebuild the experiment when another pathway is selected.
+    const selectedPathway = assessment.pathways[0]?.pathway || "";
+    const roadmap = roadmapAgent(profile, selectedPathway);
+    log("Career Coach Agent", roadmap.status, { pathway: roadmap.pathway });
+
     res.json({
       ...assessment,
       workflow: {
@@ -217,12 +224,14 @@ app.post("/api/agents/assessment", async (req, res) => {
           "Research Agent",
           "Verification Agent",
           "Career Intelligence Agent",
-          "Opportunity Matching Agent"
+          "Opportunity Matching Agent",
+          "Career Coach Agent"
         ],
-        agents_pending: ["Career Coach Agent"],
-        note: "Career Coach Agent runs when a pathway is selected for a 90-day experiment."
+        agents_pending: [],
+        note: "The Career Coach Agent automatically creates an initial 90-day experiment from the strongest pathway signal. Selecting another pathway rebuilds the experiment for that pathway."
       },
-      intelligence: intelligence.recommendations
+      intelligence: intelligence.recommendations,
+      roadmap
     });
   } catch (e) {
     res.status(400).json({ error: e.message });
