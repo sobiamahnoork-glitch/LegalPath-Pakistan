@@ -268,11 +268,39 @@ app.post("/api/agents/assessment", async (req, res) => {
 app.post("/api/agents/roadmap", async (req, res) => {
   try {
     await loadPathways();
-    const out = roadmapAgent(req.body.profile || {}, req.body.pathway || "");
+    const profile = req.body.profile || {};
+    const pathway = req.body.pathway || "";
+    const out = roadmapAgent(profile, pathway);
+
+    let coach;
+    try {
+      coach = await careerCoach({
+        profile,
+        question: "Turn this selected legal career pathway and its 90-day experiment into concise, practical guidance. Stay grounded in the supplied context.",
+        context: {
+          career_pathways: globalThis.__LEGALPATH_PATHWAYS__ || [],
+          selected_pathway: out.pathway,
+          structured_roadmap: out,
+          verified_opportunities: []
+        }
+      });
+      log("Career Coach Agent", coach.status, { pathway: out.pathway, grounded: true });
+    } catch (coachError) {
+      coach = {
+        agent: "Career Coach Agent",
+        status: "fallback",
+        error: coachError.message,
+        grounded: false,
+        answer: "The structured 90-day experiment is ready. AI narrative coaching will appear when the Gemini service is configured."
+      };
+      log("Career Coach Agent", coach.status, { pathway: out.pathway, grounded: false });
+    }
+
     log(out.agent, out.status, {
-      pathway: out.pathway
+      pathway: out.pathway,
+      coach: coach.status
     });
-    res.json(out);
+    res.json({ ...out, coach });
   } catch (e) {
     res.status(400).json({ error: e.message });
   }
