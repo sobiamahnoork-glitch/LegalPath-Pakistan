@@ -3,30 +3,9 @@ import{createRoot}from"react-dom/client";
 import{LayoutDashboard,Map,Briefcase,MessageSquare,Activity,ChevronRight,Scale,Sparkles,Search,CheckCircle2,Clock3,ArrowUpRight,Menu,X,Target,BookOpen,ShieldCheck,Users,TrendingUp,ExternalLink,Filter,Send,UserRound,GraduationCap,Building2,CalendarDays,MapPin,Lightbulb,ChevronDown}from"lucide-react";
 import"./styles.css";
 
-const paths=[
-{name:"Litigation & Advocacy",desc:"Courtroom and dispute work involving pleadings, evidence, hearings, appeals and client representation before Pakistani courts.",roles:["Advocate","Junior Associate","Legal Researcher","Law Clerk"],skills:["Legal Research","Pleading Drafting","Advocacy","Evidence Law"],qual:"LLB/BA-LLB; enrolment and bar requirements apply to practising advocates"},
-{name:"Judiciary & Judicial Services",desc:"A court-focused route covering judicial research, legal reasoning, judgment writing and the institutional work of the Pakistani judiciary.",roles:["Law Clerk","Judicial Researcher","Civil Judge-cum-Magistrate","Judicial Officer"],skills:["Legal Research","Statutory Interpretation","Judgment Writing","Constitutional Law"],qual:"LLB/BA-LLB; judicial-service eligibility varies by jurisdiction"},
-{name:"Corporate & Commercial Law",desc:"Advising companies and businesses on contracts, incorporation, governance, transactions, disputes and regulatory compliance.",roles:["Corporate Associate","In-house Counsel","Company Secretary","Transaction Lawyer"],skills:["Contract Drafting","Commercial Law","Negotiation","Legal Opinion Writing"],qual:"LLB/BA-LLB; corporate-law specialisation is useful"},
-{name:"Government, Legislative & Regulatory Practice",desc:"Working with Parliament, ministries, regulators and public bodies on legislation, policy, regulation, legal opinions and administration.",roles:["Legislative Researcher","Legal Officer","Policy Associate","Regulatory Counsel"],skills:["Legal Research","Legislative Drafting","Policy Analysis","Constitutional Law"],qual:"LLB/BA-LLB; public-sector posts may impose additional criteria"},
-{name:"Human Rights & Public Interest Law",desc:"Using law, research and advocacy to address constitutional rights, access to justice, discrimination and protection of vulnerable groups.",roles:["Human Rights Lawyer","Legal Aid Lawyer","Policy Advocate","Programme Officer"],skills:["Human Rights Law","Legal Research","Advocacy","Policy Analysis"],qual:"LLB/BA-LLB; research and advocacy experience is valuable"},
-{name:"International Law & International Organisations",desc:"Applying public international law, human-rights law, humanitarian law and international institutional rules.",roles:["International Law Researcher","Legal Officer","Human Rights Officer","Policy Researcher"],skills:["International Law","Human Rights Law","Legal Research","Legal Writing"],qual:"LLB/BA-LLB; strong legal writing and English are important"},
-{name:"Alternative Dispute Resolution & Arbitration",desc:"Resolving commercial and civil disputes through arbitration, mediation and related mechanisms.",roles:["Arbitration Associate","Legal Counsel","Mediator","Dispute Resolution Specialist"],skills:["Arbitration","Mediation","Negotiation","Contract Interpretation"],qual:"LLB/BA-LLB; arbitration training or experience is useful"},
-{name:"Criminal Justice, Prosecution & Legal Investigation",desc:"Working across criminal litigation, prosecution, investigation, evidence and criminal-justice policy.",roles:["Criminal Lawyer","Prosecutor","Legal Investigator","Criminal Justice Researcher"],skills:["Criminal Law","Criminal Procedure","Evidence Law","Legal Research"],qual:"LLB/BA-LLB; public-sector posts have separate eligibility rules"},
-{name:"Tax, Banking, Finance & Compliance",desc:"Advising financial institutions and businesses on taxation, banking regulation, securities, anti-money laundering, compliance and financial transactions.",roles:["Tax Lawyer","Banking Counsel","Compliance Officer","Financial Regulatory Lawyer"],skills:["Tax Law","Banking Law","Financial Regulation","Compliance"],qual:"LLB/BA-LLB; tax/finance specialisation is useful"},
-{name:"Legal Academia, Research & Legal Technology",desc:"A research-oriented route combining teaching, legal scholarship, policy research, legal information systems and technology.",roles:["Research Assistant","Lecturer","Legal-Tech Analyst","Policy Researcher"],skills:["Legal Research","Legal Writing","Critical Thinking","Legal Technology"],qual:"LLB/BA-LLB; postgraduate study may be required for many academic roles"}]
-
-const opps=[];
-
 const API="/api";
 
 async function api(path,options={}){const res=await fetch(API+path,{headers:{"Content-Type":"application/json",...(options.headers||{})},...options});const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.error||"Request failed");return data}
-
-const agents=[
-["Research Agent","Collects candidate records from approved sources","Source discovery"],
-["Verification Agent","Checks source, deadline, eligibility and freshness","Trust layer"],
-["Career Intelligence Agent","Maps profiles to pathways and skill gaps","Career mapping"],
-["Opportunity Matching Agent","Matches verified opportunities to student profiles","Personalisation"],
-["Career Coach Agent","Creates grounded roadmaps and weekly actions","Action planning"]];
 
 function App(){
  const[page,setPage]=useState("Career Assessment"),[open,setOpen]=useState(false),[selectedPath,setSelectedPath]=useState(null);
