@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import express from "express";
 import cors from "cors";
 import { careerPathways, skills, opportunities } from "./data.js";
-import { researchAgent, verificationAgent, careerIntelligenceAgent, matchingAgent, fingerprint } from "./agents.js";
+import { researchAgent, verificationAgent, careerIntelligenceAgent, matchingAgent, fingerprint, assessmentAgent, roadmapAgent } from "./agents.js";
 import { careerCoach } from "./ai.js";
 
 globalThis.__LEGALPATH_PATHWAYS__ = careerPathways;
@@ -42,6 +42,67 @@ app.get("/api/health", (req, res) =>
 app.get("/api/career-pathways", (req, res) => res.json({ data: careerPathways }));
 app.get("/api/skills", (req, res) => res.json({ data: skills }));
 app.get("/api/opportunities", (req, res) => res.json({ data: opportunities }));
+
+
+app.post("/api/agents/workflow", async (req, res) => {
+  try {
+    const records = Array.isArray(req.body.records) ? req.body.records : [];
+    const profile = req.body.profile || {};
+    const pathway = req.body.pathway || "";
+
+    const research = await researchAgent({ records });
+    log(research.agent, research.status, { count: research.count });
+
+    const verification = await verificationAgent(research.records);
+    log(verification.agent, verification.status, {
+      verified: verification.verified,
+      rejected: verification.rejected
+    });
+
+    const intelligence = assessmentAgent(profile);
+    log(intelligence.agent, intelligence.status, {
+      hypotheses: intelligence.pathways.length
+    });
+
+    const verified = verification.records.filter(r => r.verification_status === "verified");
+    const matching = matchingAgent(profile, verified);
+    log(matching.agent, matching.status, { count: matching.matches.length });
+
+    const roadmap = roadmapAgent(profile, pathway || intelligence.pathways[0]?.pathway || "");
+    log(roadmap.agent, roadmap.status);
+
+    res.json({
+      workflow: "research -> verification -> career intelligence -> matching -> career coach",
+      research,
+      verification,
+      intelligence,
+      matching,
+      roadmap
+    });
+  } catch (e) {
+    res.status(400).json({ error: e.message });
+  }
+});
+
+app.post("/api/agents/assessment", (req, res) => {
+  try {
+    const out = assessmentAgent(req.body.profile || {});
+    log(out.agent, out.status, { hypotheses: out.pathways.length });
+    res.json(out);
+  } catch (e) {
+    res.status(400).json({ error: e.message });
+  }
+});
+
+app.post("/api/agents/roadmap", (req, res) => {
+  try {
+    const out = roadmapAgent(req.body.profile || {}, req.body.pathway || "");
+    log(out.agent, out.status, { pathway: out.pathway });
+    res.json(out);
+  } catch (e) {
+    res.status(400).json({ error: e.message });
+  }
+});
 
 app.post("/api/agents/research", async (req, res) => {
   try {
