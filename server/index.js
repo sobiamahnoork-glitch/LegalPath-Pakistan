@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import express from "express";
 import cors from "cors";
 import { careerPathways, skills, opportunities } from "./data.js";
-import { getCareerPathwaysFromDb, getSkillsFromDb, getApprovedSourcesFromDb, supabaseConfigured } from "./supabase.js";
+import { getCareerPathwaysFromDb, getSkillsFromDb, getApprovedSourcesFromDb, getVerifiedOpportunitiesFromDb, supabaseConfigured } from "./supabase.js";
 import { researchAgent, verificationAgent, careerIntelligenceAgent, matchingAgent, fingerprint, assessmentAgent, roadmapAgent } from "./agents.js";
 import { careerCoach } from "./ai.js";
 
@@ -30,20 +30,29 @@ const log = (agent, status, meta = {}) => {
   return entry;
 };
 
+async function loadPathways() {
+  const data = await getCareerPathwaysFromDb();
+  globalThis.__LEGALPATH_PATHWAYS__ = data;
+  return data;
+}
+
+async function loadOpportunities() {
+  return supabaseConfigured ? getVerifiedOpportunitiesFromDb() : opportunities;
+}
+
 app.get("/api/health", (req, res) =>
   res.json({
     ok: true,
     service: "LegalPath Pakistan API",
     database: supabaseConfigured ? "configured" : "not configured",
     ai: !!process.env.GEMINI_API_KEY,
-    version: "0.4.0"
+    version: "0.5.0"
   })
 );
 
 app.get("/api/career-pathways", async (req, res) => {
   try {
-    const data = await getCareerPathwaysFromDb();
-    globalThis.__LEGALPATH_PATHWAYS__ = data;
+    const data = await loadPathways();
     res.json({ data, source: supabaseConfigured ? "supabase" : "fallback" });
   } catch (e) {
     res.status(503).json({ error: e.message });
@@ -68,14 +77,19 @@ app.get("/api/sources", async (req, res) => {
   }
 });
 
-app.get("/api/opportunities", (req, res) => res.json({ data: opportunities, source: "static" }));
-
+app.get("/api/opportunities", async (req, res) => {
+  try {
+    const data = await loadOpportunities();
+    res.json({ data, source: supabaseConfigured ? "supabase" : "static" });
+  } catch (e) {
+    res.status(503).json({ error: e.message });
+  }
+});
 
 app.post("/api/agents/workflow", async (req, res) => {
   try {
     const records = Array.isArray(req.body.records) ? req.body.records : [];
     const profile = req.body.profile || {};
-    const pathway = req.body.pathway || "";
 
     const research = await researchAgent({ records });
     log(research.agent, research.status, { count: research.count });
@@ -83,22 +97,23 @@ app.post("/api/agents/workflow", async (req, res) => {
     const verification = await verificationAgent(research.records);
     log(verification.agent, verification.status, {
       verified: verification.verified,
-      rejected: verification.rejected
+      rejected: verification.rejected,
+      active: verification.active
     });
 
-    const pathways = await getCareerPathwaysFromDb();
-    globalThis.__LEGALPATH_PATHWAYS__ = pathways;
+    await loadPathways();
     const intelligence = assessmentAgent(profile);
     log(intelligence.agent, intelligence.status, {
       hypotheses: intelligence.pathways.length
     });
 
-    const verified = verification.records.filter(r => r.verification_status === "verified");
+    const verified = verification.records.filter(r => r.verification_status === "verified" && r.is_active);
     const matching = matchingAgent(profile, verified);
     log(matching.agent, matching.status, { count: matching.matches.length });
 
-    const roadmap = roadmapAgent(profile, pathway || intelligence.pathways[0]?.pathway || "");
-    log(roadmap.agent, roadmap.status);
+    const selectedPathway = req.body.pathway || intelligence.pathways[0]?.pathway || "";
+    const roadmap = roadmapAgent(profile, selectedPathway);
+    log(roadmap.agent, roadmap.status, { pathway: roadmap.pathway });
 
     res.json({
       workflow: "research -> verification -> career intelligence -> matching -> career coach",
@@ -115,19 +130,24 @@ app.post("/api/agents/workflow", async (req, res) => {
 
 app.post("/api/agents/assessment", async (req, res) => {
   try {
-    globalThis.__LEGALPATH_PATHWAYS__ = await getCareerPathwaysFromDb();
+    await loadPathways();
     const out = assessmentAgent(req.body.profile || {});
-    log(out.agent, out.status, { hypotheses: out.pathways.length });
+    log(out.agent, out.status, {
+      hypotheses: out.pathways.length
+    });
     res.json(out);
   } catch (e) {
     res.status(400).json({ error: e.message });
   }
 });
 
-app.post("/api/agents/roadmap", (req, res) => {
+app.post("/api/agents/roadmap", async (req, res) => {
   try {
+    await loadPathways();
     const out = roadmapAgent(req.body.profile || {}, req.body.pathway || "");
-    log(out.agent, out.status, { pathway: out.pathway });
+    log(out.agent, out.status, {
+      pathway: out.pathway
+    });
     res.json(out);
   } catch (e) {
     res.status(400).json({ error: e.message });
@@ -147,7 +167,11 @@ app.post("/api/agents/research", async (req, res) => {
 app.post("/api/agents/verify", async (req, res) => {
   try {
     const out = await verificationAgent(req.body.records || []);
-    log(out.agent, out.status, { verified: out.verified, rejected: out.rejected });
+    log(out.agent, out.status, {
+      verified: out.verified,
+      rejected: out.rejected,
+      active: out.active
+    });
     res.json(out);
   } catch (e) {
     res.status(400).json({ error: e.message });
@@ -156,7 +180,7 @@ app.post("/api/agents/verify", async (req, res) => {
 
 app.post("/api/agents/career-intelligence", async (req, res) => {
   try {
-    globalThis.__LEGALPATH_PATHWAYS__ = await getCareerPathwaysFromDb();
+    await loadPathways();
     const out = careerIntelligenceAgent(req.body.profile || {});
     log(out.agent, out.status);
     res.json(out);
@@ -167,7 +191,10 @@ app.post("/api/agents/career-intelligence", async (req, res) => {
 
 app.post("/api/agents/match", async (req, res) => {
   try {
-    const out = matchingAgent(req.body.profile || {}, req.body.opportunities || opportunities);
+    const live = await loadOpportunities();
+    const supplied = Array.isArray(req.body.opportunities) ? req.body.opportunities : null;
+    const source = supplied || live;
+    const out = matchingAgent(req.body.profile || {}, source);
     log(out.agent, out.status, { count: out.matches.length });
     res.json(out);
   } catch (e) {

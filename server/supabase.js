@@ -41,7 +41,7 @@ export async function getCareerPathwaysFromDb() {
     const pathwayMappings = mappings
       .filter(mapping => mapping.pathway_id === pathway.id)
       .sort((a, b) => {
-        const order = { core: 0, supporting: 1, optional: 2 };
+        const order = { core: 0, supporting: 1, advanced: 2 };
         return (order[a.importance] ?? 99) - (order[b.importance] ?? 99);
       });
 
@@ -52,23 +52,19 @@ export async function getCareerPathwaysFromDb() {
       description: pathway.description || "",
       roles: pathway.typical_roles || [],
       qualification: pathway.required_qualification || "",
-      skills: pathwayMappings
-        .map(mapping => skillsById.get(mapping.skill_id)?.name)
-        .filter(Boolean),
-      skill_details: pathwayMappings
-        .map(mapping => {
-          const skill = skillsById.get(mapping.skill_id);
-          return skill
-            ? {
-                id: skill.id,
-                name: skill.name,
-                description: skill.description || "",
-                category: skill.category || null,
-                importance: mapping.importance || "core"
-              }
-            : null;
-        })
-        .filter(Boolean),
+      skills: pathwayMappings.map(mapping => skillsById.get(mapping.skill_id)?.name).filter(Boolean),
+      skill_details: pathwayMappings.map(mapping => {
+        const skill = skillsById.get(mapping.skill_id);
+        return skill
+          ? {
+              id: skill.id,
+              name: skill.name,
+              description: skill.description || "",
+              category: skill.category || null,
+              importance: mapping.importance || "core"
+            }
+          : null;
+      }).filter(Boolean),
       source_url: pathway.source_url || "",
       verification_date: pathway.verification_date || null
     };
@@ -77,15 +73,27 @@ export async function getCareerPathwaysFromDb() {
 
 export async function getSkillsFromDb() {
   if (!supabaseConfigured) return fallbackSkills;
-
   const rows = await request("skills?select=name&order=name.asc");
   return rows.map(row => row.name);
 }
 
 export async function getApprovedSourcesFromDb() {
   if (!supabaseConfigured) return [];
-
   return request(
     "sources?select=id,name,url,source_type,authority_tier,is_approved,last_checked_at,last_successful_fetch_at&is_approved=eq.true&order=name.asc"
   );
+}
+
+export async function getVerifiedOpportunitiesFromDb() {
+  if (!supabaseConfigured) return [];
+
+  const rows = await request(
+    "opportunities?select=id,title,organisation,opportunity_type,description,location,remote_allowed,application_url,source_id,deadline,eligibility,verification_status,verified_at,last_verified_at,fingerprint,is_active&verification_status=eq.verified&is_active=eq.true&order=deadline.asc.nullslast"
+  );
+
+  return rows.map(row => ({
+    ...row,
+    type: row.opportunity_type,
+    source_url: row.application_url || null
+  }));
 }
