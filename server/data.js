@@ -10,9 +10,5 @@ export const skills=[
 "Legal Research","Case Law Research","Statutory Interpretation","Legal Drafting","Contract Drafting","Pleading Drafting","Legal Opinion Writing","Constitutional Law","Civil Law","Criminal Law","Family Law","Evidence Law","Legal Citation","Legal Writing","Policy Analysis","Critical Thinking","Communication","Advocacy","Negotiation","Presentation","Case Management","Time Management","Legal Technology","AI-Assisted Legal Research","Document Analysis"
 ];
 
-export const opportunities=[
-{id:"seed-1",title:"Legal Research Intern",organisation:"Source data required",type:"Internship",pathway:"academia",skills:["Legal Research","Legal Writing"],deadline:null,source_url:null,verification_status:"pending"},
-{id:"seed-2",title:"Junior Legal Officer",organisation:"Source data required",type:"Employment",pathway:"government",skills:["Legal Drafting","Legal Research"],deadline:null,source_url:null,verification_status:"pending"},
-{id:"seed-3",title:"Research Assistant",organisation:"Source data required",type:"Research",pathway:"academia",skills:["Research Analysis","Legal Writing"],deadline:null,source_url:null,verification_status:"pending"},
-{id:"seed-4",title:"Legal Intern",organisation:"Source data required",type:"Internship",pathway:"corporate",skills:["Contract Drafting","Legal Research"],deadline:null,source_url:null,verification_status:"pending"}
-];
+// Dynamic opportunities are intentionally empty until records pass the approved-source + verification pipeline.
+export const opportunities=[];
