@@ -215,7 +215,33 @@ app.post("/api/agents/assessment", async (req, res) => {
     // while the UI can still rebuild the experiment when another pathway is selected.
     const selectedPathway = assessment.pathways[0]?.pathway || "";
     const roadmap = roadmapAgent(profile, selectedPathway);
-    log("Career Coach Agent", roadmap.status, { pathway: roadmap.pathway });
+
+    // Keep the structured roadmap as the deterministic layer and add
+    // grounded Gemini coaching from the same supplied career context.
+    let coach;
+    try {
+      coach = await careerCoach({
+        profile,
+        question: "Turn the strongest pathway signal into concise, practical career guidance for the next 90 days.",
+        context: {
+          career_pathways: globalThis.__LEGALPATH_PATHWAYS__ || [],
+          selected_pathway: selectedPathway,
+          assessment: assessment.pathways,
+          structured_roadmap: roadmap,
+          verified_opportunities: []
+        }
+      });
+      log("Career Coach Agent", coach.status, { pathway: roadmap.pathway, grounded: true });
+    } catch (coachError) {
+      coach = {
+        agent: "Career Coach Agent",
+        status: "fallback",
+        error: coachError.message,
+        grounded: false,
+        answer: "The structured 90-day experiment is ready. AI narrative coaching will appear when the Gemini service is configured."
+      };
+      log("Career Coach Agent", coach.status, { pathway: roadmap.pathway, grounded: false });
+    }
 
     res.json({
       ...assessment,
@@ -228,10 +254,11 @@ app.post("/api/agents/assessment", async (req, res) => {
           "Career Coach Agent"
         ],
         agents_pending: [],
-        note: "The Career Coach Agent automatically creates an initial 90-day experiment from the strongest pathway signal. Selecting another pathway rebuilds the experiment for that pathway."
+        note: "The Career Coach Agent combines a structured pathway experiment with grounded AI coaching. Selecting another pathway rebuilds the experiment for that pathway."
       },
       intelligence: intelligence.recommendations,
-      roadmap
+      roadmap,
+      coach
     });
   } catch (e) {
     res.status(400).json({ error: e.message });
