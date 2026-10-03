@@ -222,28 +222,25 @@ header{height:78px;padding:16px 46px;background:rgba(255,255,255,.94);backdrop-f
 @media(max-width:900px){.side{width:274px}main{margin-left:0;width:100%}header{height:72px;padding:14px 20px}.content{padding:25px 20px 55px}.pageIntro h2{font-size:31px}.assessmentResult{order:-1}.agentPipeline{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:620px){header{padding:13px 15px}.content{padding:20px 14px 45px}.pageIntro h2{font-size:27px}.pageIntro p{font-size:12px}.assessmentForm,.assessmentResult{padding:18px;border-radius:14px}.agentPipeline{grid-template-columns:1fr}.agentStrip{padding:15px}.journey{margin-top:13px}.headerStatus{display:none}.resultHeader h3{font-size:20px!important}}
 
-
 /* =========================================================
-   LEGALPATH — PROFESSIONAL LEGAL INTELLIGENCE THEME
-   Visual-only refinement: preserves existing components and responsive behavior.
+   LEGALPATH — EDITORIAL LEGAL-TECH THEME
+   Visual-only refinement. Existing functionality/components preserved.
    ========================================================= */
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
 
 :root{
-  --navy:#0b1f3a;
-  --navy-deep:#07172b;
-  --blue:#2457a6;
-  --blue-strong:#17478f;
-  --blue-soft:#eaf1fb;
-  --blue-pale:#f5f8fc;
-  --ink:#172b46;
-  --body:#4f6075;
-  --muted:#7a889a;
-  --line:#dce4ee;
-  --paper:#f6f8fb;
-  --white:#ffffff;
-  --accent:#b18a45;
-  --green:#4f7b61;
+  --forest:#173b34;
+  --forest-deep:#102c27;
+  --forest-soft:#e9f0ed;
+  --brass:#a8874b;
+  --brass-soft:#f4efe4;
+  --ink:#242822;
+  --body:#5e665f;
+  --muted:#858b84;
+  --line:#deded6;
+  --paper:#f4f1ea;
+  --white:#fffdfa;
+  --green:#5d7d69;
 }
 
 html{font-family:'DM Sans',ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--paper)}
@@ -253,140 +250,132 @@ button,input,select,textarea{font-family:inherit}
 .app{background:var(--paper)}
 .side{
   width:278px;
-  background:linear-gradient(180deg,var(--navy-deep) 0%,#0c2545 54%,#0a1d36 100%);
-  border-right:1px solid #183452;
+  background:linear-gradient(180deg,var(--forest-deep) 0%,#173b34 58%,#122f2a 100%);
+  border-right:1px solid #284b43;
   padding:25px 16px;
 }
 .brand{padding:2px 12px 31px}
 .mark{
-  width:43px;height:43px;border-radius:10px;
-  background:#102b4d;border:1px solid rgba(177,138,69,.45);
-  color:#d5b66f;box-shadow:0 10px 24px rgba(0,0,0,.18)
+  width:43px;height:43px;border-radius:9px;
+  background:#1d453d;border:1px solid rgba(196,166,101,.55);
+  color:#d5bd80;box-shadow:0 10px 24px rgba(7,28,24,.22)
 }
-.brand b{font-family:'Libre Baskerville',Georgia,serif;font-size:19px;letter-spacing:-.4px;color:#fff}
-.brand small{font-size:8px;letter-spacing:2.8px;color:#8fa2ba}
-.navLabel{font-size:8px;letter-spacing:2px;color:#6f849f;padding:5px 13px 10px}
-.nav{font-size:13px;padding:12px 13px;border-radius:8px;color:#aebdd0;margin:2px 0}
+.brand b{font-family:'Cormorant Garamond',Georgia,serif;font-size:24px;letter-spacing:-.2px;color:#fff}
+.brand small{font-size:8px;letter-spacing:2.8px;color:#9eb2aa}
+.navLabel{font-size:8px;letter-spacing:2px;color:#77938a;padding:5px 13px 10px}
+.nav{font-size:13px;padding:12px 13px;border-radius:8px;color:#aec0ba;margin:2px 0}
 .nav:hover{background:rgba(255,255,255,.055);color:#fff}
-.nav.active{background:#15385f;color:#fff;box-shadow:inset 3px 0 0 #b18a45}
-.nav.active svg{color:#d3b46d}
-.sideCard{margin:25px 5px 0;padding:15px;border-radius:10px;background:rgba(255,255,255,.035);border:1px solid #27415f}
-.sideCard svg{color:#c5a661}.sideCard b{font-size:10px}.sideCard span{font-size:9px;color:#8296af}
-.sideFoot{border-top-color:#24405f}.sideFoot span{color:#b9a06a}.sideFoot small{color:#71859e}
+.nav.active{background:#245048;color:#fff;box-shadow:inset 3px 0 0 var(--brass)}
+.nav.active svg{color:#d5bb7a}
+.sideCard{margin:25px 5px 0;padding:15px;border-radius:10px;background:rgba(255,255,255,.035);border:1px solid #31574f}
+.sideCard svg{color:#cbb274}.sideCard b{font-size:10px}.sideCard span{font-size:9px;color:#8ca39b}
+.sideFoot{border-top-color:#31574f}.sideFoot span{color:#c6ad73}.sideFoot small{color:#789189}
 
 main{margin-left:278px;width:calc(100% - 278px);background:var(--paper)}
 header{
-  height:76px;padding:15px 48px;background:rgba(255,255,255,.97);
-  border-bottom:1px solid var(--line);box-shadow:0 1px 0 rgba(16,38,66,.025)
+  height:76px;padding:15px 48px;background:rgba(255,253,250,.96);
+  border-bottom:1px solid var(--line);box-shadow:0 1px 0 rgba(30,42,35,.025)
 }
-.eyebrow{font-size:8px;letter-spacing:2.3px;color:#8795a7;font-weight:700}
-.eyebrow+h1{font-family:'Libre Baskerville',Georgia,serif;font-size:19px;letter-spacing:-.4px;color:var(--navy);margin-top:3px}
-.headerStatus{font-size:9px;padding:7px 10px;background:#f7faf8;border:1px solid #dce8df}
-.profile{background:#eef3f9;color:#45617f;border:1px solid #dce5ef}
+.eyebrow{font-size:8px;letter-spacing:2.3px;color:#8a8f88;font-weight:700}
+.eyebrow+h1{font-family:'Cormorant Garamond',Georgia,serif;font-size:23px;letter-spacing:-.2px;color:var(--forest-deep);margin-top:1px}
+.headerStatus{font-size:9px;padding:7px 10px;background:#f4f7f4;border:1px solid #dbe5df}
+.profile{background:#f0f2ed;color:#53645b;border:1px solid #dde1d9}
 
-.content{padding:39px 48px 72px;max-width:1480px}
+.content{
+  padding:39px 48px 72px;max-width:1480px;
+  background:radial-gradient(circle at 90% 0%,rgba(168,135,75,.055),transparent 32%),var(--paper)
+}
 .pageIntro h2,.coachPage h2{
-  font-family:'Libre Baskerville',Georgia,serif;
-  color:var(--navy);font-weight:700;letter-spacing:-1.3px
+  font-family:'Cormorant Garamond',Georgia,serif;
+  color:var(--forest-deep);font-weight:700;letter-spacing:-1.1px
 }
-.pageIntro h2{font-size:35px;line-height:1.18}
+.pageIntro h2{font-size:42px;line-height:1.05}
 .pageIntro p{color:var(--body);font-size:13px;line-height:1.75}
-.journey{border-color:#d9e2ed;background:#fff;border-radius:8px;padding:4px}
-.journey span{font-size:8px;padding:7px 10px}
-.journey .journeyActive{background:var(--navy);color:#d9bc79}
+.journey{border-color:#d9ddd7;background:var(--white);border-radius:7px;padding:4px;box-shadow:0 4px 16px rgba(29,48,41,.035)}
+.journey span{font-size:8px;padding:7px 10px}.journey .journeyActive{background:var(--forest-deep);color:#dcc38a}
 
-/* Assessment: editorial two-column workspace */
+.agentStrip{
+  background:linear-gradient(120deg,#102c27,#1b453d);
+  border-radius:11px;box-shadow:0 14px 30px rgba(13,43,36,.13)
+}
+.agentStripHead h3{font-family:'Cormorant Garamond',Georgia,serif;font-size:20px}
+.agentCount{background:#245048;color:#dcc184}
+.pipelineAgent{background:rgba(255,255,255,.035);border-color:#315c53;border-radius:7px}
+.pipelineAgent.done{background:#20483f;border-color:#8e7541}
+.pipelineAgent.done>svg{color:#dcc082}
+.pipelineNo{color:#d0b477}
+
 .assessmentGrid{grid-template-columns:minmax(390px,.82fr) minmax(540px,1.18fr);gap:20px}
 .assessmentForm,.assessmentResult{
-  border:1px solid var(--line);border-radius:12px;background:#fff;
-  box-shadow:0 8px 28px rgba(15,37,65,.035)
+  border:1px solid var(--line);border-radius:11px;background:var(--white);
+  box-shadow:0 8px 28px rgba(35,45,38,.035)
 }
-.assessmentForm{padding:27px}
-.assessmentResult{padding:30px}
-.formSection{border-bottom:1px solid #e7edf4;margin-top:21px}
+.assessmentForm{padding:27px}.assessmentResult{padding:30px}
+.formSection{border-bottom:1px solid #e7e5de;margin-top:21px}
 .formSection:first-child{margin-top:0}
-.formSection>span{background:var(--blue);color:#fff;border-radius:6px;width:23px;height:23px}
-.formSection b{color:var(--navy);font-size:12px}
-.formSection small{color:#8290a2}
-.assessmentForm>label{color:#50627a;font-size:11px}
+.formSection>span{background:var(--forest);color:#fff;border-radius:5px;width:23px;height:23px}
+.formSection b{color:var(--forest-deep);font-size:12px}.formSection small{color:#858d86}
+.assessmentForm>label{color:#58635c;font-size:11px}
 .assessmentForm input:not([type=range]),.assessmentForm select,.assessmentForm textarea{
-  background:#fbfcfe;border:1px solid #d7e0eb;color:#253b57;border-radius:7px
+  background:#fffefa;border:1px solid #d9ddd5;color:#29322d;border-radius:7px
 }
 .assessmentForm input:not([type=range]):focus,.assessmentForm select:focus,.assessmentForm textarea:focus{
-  border-color:#5680bd;box-shadow:0 0 0 3px #eaf1fb
+  border-color:#8d7650;box-shadow:0 0 0 3px var(--brass-soft)
 }
 .assessmentForm .primary.full{
-  background:var(--blue);color:#fff;border-radius:7px;box-shadow:0 8px 18px rgba(36,87,166,.18)
+  background:var(--forest);color:#fff;border-radius:7px;box-shadow:0 8px 18px rgba(23,59,52,.16)
 }
-.assessmentForm .primary.full:hover{background:var(--blue-strong);filter:none}
+.assessmentForm .primary.full:hover{background:#204d44;filter:none}
 
-/* Agent pipeline: restrained institutional blue */
-.agentStrip{background:linear-gradient(120deg,#0a1d35,#12365e);border-radius:12px;box-shadow:0 13px 28px rgba(8,30,56,.12)}
-.agentStripHead h3{font-family:'Libre Baskerville',Georgia,serif;font-size:16px}
-.agentCount{background:#173d68;color:#d8bd7b}
-.pipelineAgent{background:rgba(255,255,255,.035);border-color:#315274;border-radius:8px}
-.pipelineAgent.done{background:#173b62;border-color:#5579a0}
-.pipelineAgent.done>svg{color:#d4b56d}
-.pipelineNo{color:#c9aa64}
+.resultHeader h3,.roadmapHead h4,.modal h2{
+  font-family:'Cormorant Garamond',Georgia,serif;color:var(--forest-deep)
+}
+.resultHeader h3{font-size:27px}
+.liveBadge{background:#f2f6f2;border-color:#d8e4dc;color:#557261}
+.resultStatus{background:#f3f7f4;border-color:#d9e4dd;color:#52665a}
+.resultStatus b{color:var(--forest-deep)}
+.hypothesis{border-color:#dedfd8;background:#fffefa;border-radius:8px}
+.hypothesis:hover{border-color:#b89c62;box-shadow:0 9px 24px rgba(43,48,39,.07)}
+.hypothesisTop b{color:var(--forest-deep)}
+.signalBadge{background:var(--forest-soft);color:#41685d}
+.signalGrid>div{background:#f3f5f1}
+.signalGrid small,.evidence small{color:#718078}
+.roadmapBox{background:#fcfbf7;border-color:#dfddd5;border-radius:9px;box-shadow:none}
+.roadmapHead>span{background:var(--forest-deep);color:#dcc185}
+.experimentGoal{background:#f8f4eb;border-color:#e7deca}
+.experimentGoal small,.successBox>small{color:#907648}
+.successBox{background:#f1f6f2;border-color:#d6e3da}
+.aiCoachBox{background:#f3f5f2;border-color:#dce1da}
 
-/* Results */
-.resultHeader h3{font-family:'Libre Baskerville',Georgia,serif;color:var(--navy);font-size:23px}
-.liveBadge{background:#f2f7f4;border-color:#d9e6de;color:#4f715d}
-.resultStatus{background:#f4f8fc;border-color:#dbe5f0;color:#4c6480}
-.resultStatus b{color:var(--navy)}
-.hypothesis{border-color:#dce5ef;background:#fff;border-radius:9px}
-.hypothesis:hover{border-color:#7b9bc4;box-shadow:0 9px 24px rgba(25,55,91,.07)}
-.hypothesisTop b{color:var(--navy)}
-.signalBadge{background:var(--blue-soft);color:#315d97}
-.signalGrid>div{background:#f5f8fc}
-.signalGrid small,.evidence small{color:#6e83a0}
-.roadmapBox{background:#fbfcfe;border-color:#dbe4ee;border-radius:10px;box-shadow:none}
-.roadmapHead h4{font-family:'Libre Baskerville',Georgia,serif;color:var(--navy)}
-.roadmapHead>span{background:var(--navy);color:#d9bc79}
-.experimentGoal{background:#f7f9fc;border-color:#dce5ef}
-.experimentGoal small,.successBox>small{color:#6d83a0}
-.successBox{background:#f3f8f5;border-color:#d8e6dc}
-.aiCoachBox{background:#f5f8fc;border-color:#dbe4ef}
+.bigCard,.panel,.stat,.pathCard,.table{border-color:var(--line);box-shadow:0 6px 22px rgba(35,45,38,.03)}
+.bigCard{border-radius:10px}.bigCard:hover{border-color:#b9aa88;box-shadow:0 13px 30px rgba(35,45,38,.08)}
+.pathCard{border-radius:9px}.pathCard:hover{border-color:#b9aa88;box-shadow:0 10px 25px rgba(35,45,38,.07)}
+.pathCard>span,.num{color:#917746}
+.pathCard h4{color:var(--forest-deep);font-family:'Cormorant Garamond',Georgia,serif;font-size:18px}
+.pathIcon,.statIcon,.oppIcon{background:var(--forest-soft);color:#4b6e63}
+.chips span{background:#faf9f5;border-color:#dedfd8;color:#657069}
+.search{border-color:#d9ddd5;background:#fffefa}
+.search:focus-within{border-color:#9d8a65;box-shadow:0 0 0 3px var(--brass-soft)}
+.outlineBtn{border-color:#cfcfc5;color:#315b50;border-radius:7px}
+.outlineBtn:hover{border-color:#a88a52;background:#faf7ef;color:#23483f}
 
-/* Career map / cards */
-.bigCard,.panel,.stat,.pathCard,.table{border-color:var(--line);box-shadow:0 6px 22px rgba(18,42,70,.03)}
-.bigCard{border-radius:11px}
-.bigCard:hover{border-color:#a8bdd7;box-shadow:0 13px 30px rgba(18,42,70,.08)}
-.pathCard{border-radius:10px}
-.pathCard:hover{border-color:#9bb5d4;box-shadow:0 10px 25px rgba(18,42,70,.07)}
-.pathCard>span,.num{color:#6b83a2}
-.pathCard h4{color:var(--navy);font-family:'Libre Baskerville',Georgia,serif;font-size:14px}
-.pathIcon,.statIcon,.oppIcon{background:var(--blue-soft);color:#41699d}
-.chips span{background:#f7f9fc;border-color:#dce5ef;color:#617590}
-.search{border-color:#d7e1ec;background:#fff}
-.search:focus-within{border-color:#7294bd;box-shadow:0 0 0 3px #eaf1fb}
-.outlineBtn{border-color:#cfdbe8;color:#315b8f;border-radius:7px}
-.outlineBtn:hover{border-color:#7294bd;background:#f6f9fd;color:#214e85}
-
-/* Modal / coach */
-.modal{border-radius:14px;border:1px solid #dbe3ed}
-.modal h2{font-family:'Libre Baskerville',Georgia,serif;color:var(--navy)}
-.close{background:#f0f4f8;color:#526983}
-.coachAvatar{background:var(--navy);color:#d8bc77}
-.coachPage h2{font-size:43px}
-.coachForm,.coachAside{border-color:var(--line);border-radius:12px;box-shadow:0 7px 24px rgba(18,42,70,.03)}
-.coachForm textarea:focus,.coachForm select:focus{border-color:#5680bd;box-shadow:0 0 0 3px #eaf1fb}
-.coachRule{background:#f5f8fc;color:#58708e}
+.modal{border-radius:13px;border:1px solid #dddcd4}
+.close{background:#f0f1ed;color:#59645e}
+.coachAvatar{background:var(--forest-deep);color:#dcc080}
+.coachPage h2{font-size:48px}
+.coachForm,.coachAside{border-color:var(--line);border-radius:11px;box-shadow:0 7px 24px rgba(35,45,38,.03)}
+.coachForm textarea:focus,.coachForm select:focus{border-color:#8d7650;box-shadow:0 0 0 3px var(--brass-soft)}
+.coachRule{background:#f7f3ea;color:#6f6045}
 
 @media(max-width:1100px){
  .side{width:250px}main{margin-left:250px;width:calc(100% - 250px)}
- .content{padding-left:30px;padding-right:30px}
- .assessmentGrid{grid-template-columns:1fr}
+ .content{padding-left:30px;padding-right:30px}.assessmentGrid{grid-template-columns:1fr}
 }
 @media(max-width:900px){
- .side{width:278px}.content{padding:27px 21px 55px}
- header{padding:14px 21px}
- .assessmentGrid{grid-template-columns:1fr}
- .assessmentResult{order:-1}
+ .side{width:278px}.content{padding:27px 21px 55px}header{padding:14px 21px}
+ .assessmentGrid{grid-template-columns:1fr}.assessmentResult{order:-1}
 }
 @media(max-width:620px){
- .content{padding:21px 14px 45px}
- .pageIntro h2{font-size:27px}
- .assessmentForm,.assessmentResult{padding:18px;border-radius:10px}
- .coachPage h2{font-size:33px}
+ .content{padding:21px 14px 45px}.pageIntro h2{font-size:34px}
+ .assessmentForm,.assessmentResult{padding:18px;border-radius:9px}.coachPage h2{font-size:38px}
 }
