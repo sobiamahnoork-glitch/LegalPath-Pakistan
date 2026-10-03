@@ -1,4 +1,4 @@
-import"dotenv/config";import express from"express";import cors from"cors";import{careerPathways,skills,opportunities}from"./data.js";import{researchAgent,verificationAgent,careerIntelligenceAgent,matchingAgent,fingerprint}from"./agents.js";import{careerCoach}from"./ai.js";
+import"dotenv/config";import crypto from"node:crypto";import express from"express";import cors from"cors";import{careerPathways,skills,opportunities}from"./data.js";import{researchAgent,verificationAgent,careerIntelligenceAgent,matchingAgent,fingerprint}from"./agents.js";import{careerCoach}from"./ai.js";
 globalThis.__LEGALPATH_PATHWAYS__=careerPathways;
 const app=express();app.use(cors());app.use(express.json({limit:"1mb"}));
 const port=process.env.PORT||8787;
