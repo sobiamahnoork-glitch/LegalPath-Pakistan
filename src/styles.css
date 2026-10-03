@@ -379,3 +379,99 @@ header{
  .content{padding:21px 14px 45px}.pageIntro h2{font-size:34px}
  .assessmentForm,.assessmentResult{padding:18px;border-radius:9px}.coachPage h2{font-size:38px}
 }
+
+
+/* Responsive hardening — preserve existing UI and functionality */
+html,body,#root{width:100%;min-width:0;overflow-x:hidden}
+img,svg{max-width:100%}
+button,input,select,textarea{max-width:100%}
+main{min-width:0}
+.content{width:100%;min-width:0}
+.assessmentGrid,.coachGrid,.bigGrid,.lower{min-width:0}
+.assessmentForm,.assessmentResult,.bigCard,.panel,.table,.coachForm,.coachAside{min-width:0}
+.hero,.assessmentIntro,.resultHeader,.roadmapHead{min-width:0}
+.heroCopy,.assessmentIntro>div,.resultHeader>div,.roadmapHead>div{min-width:0}
+.hero h2,.pageIntro h2,.coachPage h2,.resultHeader h3,.roadmapHead h4{overflow-wrap:anywhere}
+.pathCard h4,.bigCard h3{overflow-wrap:anywhere}
+.search input{min-width:0}
+
+@media (max-width:900px){
+  .side{width:min(82vw,300px);max-width:300px}
+  main{width:100%;margin-left:0}
+  header{min-height:72px;height:auto;padding:14px 18px}
+  .headerLeft{min-width:0}
+  .headerLeft>div{min-width:0}
+  .eyebrow+h1{white-space:normal;overflow-wrap:anywhere}
+  .headerStatus{display:none}
+  .content{padding:24px 18px 50px}
+  .hero{width:100%;min-height:0;padding:30px}
+  .heroCopy{width:100%}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pathGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .bigGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .assessmentGrid{grid-template-columns:minmax(0,1fr)}
+  .assessmentResult{order:-1}
+  .coachGrid,.lower{grid-template-columns:minmax(0,1fr)}
+  .agentPipeline{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .journey{overflow-x:auto;max-width:100%}
+  .journey span{flex:0 0 auto}
+  .mapTools{flex-wrap:wrap}
+  .search{min-width:0;width:100%}
+  .toolNote{width:100%;padding:0}
+}
+
+@media (max-width:620px){
+  .content{padding:18px 12px 38px}
+  header{padding:12px 14px}
+  .hamb{margin-right:8px}
+  .eyebrow{letter-spacing:1.3px}
+  .eyebrow+h1{font-size:18px}
+  .hero{padding:22px 18px;border-radius:14px}
+  .hero h2{font-size:30px;line-height:1.08;letter-spacing:-.8px}
+  .hero p{font-size:13px}
+  .actions{width:100%;gap:8px}
+  .actions>*{width:100%}
+  .stats{grid-template-columns:1fr 1fr;gap:8px}
+  .stat{padding:11px;gap:8px}
+  .statIcon{width:30px;height:30px;flex:0 0 30px}
+  .stat b{font-size:13px}
+  .stat span{font-size:9px}
+  .pathGrid,.bigGrid{grid-template-columns:1fr}
+  .pageIntro h2{font-size:30px;line-height:1.12}
+  .pageIntro p{font-size:12px}
+  .assessmentIntro{display:block}
+  .journey{margin-top:14px;width:100%}
+  .assessmentForm,.assessmentResult{padding:16px}
+  .agentStrip{padding:15px;border-radius:13px}
+  .agentStripHead{display:block}
+  .agentCount{display:inline-flex;margin-top:10px}
+  .agentPipeline{grid-template-columns:1fr}
+  .pipelineAgent{min-height:auto}
+  .formSection{margin-top:18px}
+  .rangeGrid{grid-template-columns:1fr!important}
+  .hypothesis{padding:14px!important}
+  .hypothesisTop{align-items:flex-start}
+  .signalGrid{grid-template-columns:1fr!important}
+  .resultHeader{display:block}
+  .liveBadge{margin-top:9px;display:inline-flex}
+  .roadmapHead{display:block}
+  .roadmapHead>span{display:inline-flex;margin-top:8px}
+  .roleList,.detailGrid{grid-template-columns:1fr}
+  .modalBack{padding:10px}
+  .modal{width:100%;max-height:92vh;padding:22px 16px}
+  .modal h2{font-size:27px;line-height:1.08}
+  .table{overflow-x:auto}
+}
+
+@media (min-width:901px) and (max-width:1180px){
+  .content{padding-left:24px;padding-right:24px}
+  .pathGrid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .hero{padding:34px}
+  .hero h2{font-size:40px}
+  .assessmentGrid{grid-template-columns:minmax(0,1fr)}
+  .assessmentResult{order:-1}
+}
+
+@media (min-width:1440px){
+  .content{max-width:1360px}
+}
