@@ -113,7 +113,7 @@ app.post("/api/agents/workflow", async (req, res) => {
   }
 });
 
-app.post("/api/agents/assessment", (req, res) => {
+app.post("/api/agents/assessment", async (req, res) => {
   try {
     globalThis.__LEGALPATH_PATHWAYS__ = await getCareerPathwaysFromDb();
     const out = assessmentAgent(req.body.profile || {});
