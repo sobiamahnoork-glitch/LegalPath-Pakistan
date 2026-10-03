@@ -1,0 +1,16 @@
+.assessmentGrid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(320px,.95fr);gap:22px;align-items:start}
+.assessmentForm,.assessmentResult{background:var(--panel,#fff);border:1px solid var(--border,#e6e8ee);border-radius:22px;padding:24px}
+.assessmentForm{display:grid;gap:10px}
+.assessmentForm label{font-size:12px;font-weight:700;color:var(--muted,#687083);text-transform:uppercase;letter-spacing:.08em}
+.assessmentForm textarea,.assessmentForm input,.assessmentForm select{width:100%;border:1px solid var(--border,#e6e8ee);border-radius:12px;padding:12px 13px;background:transparent;color:inherit;font:inherit}
+.assessmentForm textarea{min-height:82px;resize:vertical}
+.rangeGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:5px 0 8px}
+.rangeGrid label{display:grid;gap:7px}
+.rangeGrid input[type=range]{padding:0}
+.hypothesis{width:100%;display:flex;justify-content:space-between;gap:16px;text-align:left;padding:15px 0;border:0;border-bottom:1px solid var(--border,#e6e8ee);background:none;color:inherit;cursor:pointer}
+.hypothesis div{display:grid;gap:5px}.hypothesis span,.hypothesis small{color:var(--muted,#687083);line-height:1.45}.hypothesis small{font-size:11px}
+.roadmapBox{margin-top:20px;padding:18px;border-radius:16px;background:rgba(180,140,55,.08);border:1px solid rgba(180,140,55,.22)}
+.roadStep{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border,#e6e8ee);font-size:14px}.roadStep span{font-weight:800;min-width:24px}
+.emptyState{display:grid;place-items:center;text-align:center;gap:7px;padding:55px 20px;border:1px dashed var(--border,#dfe2e8);border-radius:18px;color:var(--muted,#687083)}
+.emptyState b{color:inherit}.emptyState span{max-width:480px;line-height:1.5}
+@media(max-width:900px){.assessmentGrid{grid-template-columns:1fr}.rangeGrid{grid-template-columns:1fr}}
