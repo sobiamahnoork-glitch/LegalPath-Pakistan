@@ -579,3 +579,11 @@ main{min-width:0}
   .pipelineAgent small{font-size:8px}
   .pipelineAgent span{font-size:8px}
 }
+
+/* Selected pathway experiment feedback */
+.hypothesis{position:relative}
+.hypothesis:disabled{cursor:wait;opacity:.82}
+.hypothesis.building{border-color:rgba(168,135,75,.55);box-shadow:0 0 0 1px rgba(168,135,75,.12)}
+.hypothesisAction{display:inline-flex;align-items:center;gap:5px;margin-top:10px;font-size:9px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#a8874b}
+.hypothesis.building .hypothesisAction{color:#5d7d69}
+@media(max-width:700px){.hypothesisAction{font-size:8.5px;margin-top:9px}.hypothesis:disabled{opacity:.9}}
