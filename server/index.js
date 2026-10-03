@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import express from "express";
 import cors from "cors";
 import { careerPathways, skills, opportunities } from "./data.js";
-import { getCareerPathwaysFromDb, getSkillsFromDb, getApprovedSourcesFromDb, getVerifiedOpportunitiesFromDb, supabaseConfigured } from "./supabase.js";
+import { getCareerPathwaysFromDb, getSkillsFromDb, getApprovedSourcesFromDb, getVerifiedOpportunitiesFromDb, getResearchCandidatesFromDb, supabaseConfigured } from "./supabase.js";
 import { researchAgent, verificationAgent, careerIntelligenceAgent, matchingAgent, fingerprint, assessmentAgent, roadmapAgent } from "./agents.js";
 import { careerCoach } from "./ai.js";
 
@@ -38,6 +38,10 @@ async function loadPathways() {
 
 async function loadOpportunities() {
   return supabaseConfigured ? getVerifiedOpportunitiesFromDb() : opportunities;
+}
+
+async function loadResearchCandidates() {
+  return supabaseConfigured ? getResearchCandidatesFromDb() : opportunities;
 }
 
 app.get("/api/health", (req, res) =>
@@ -87,11 +91,12 @@ app.get("/api/opportunities", async (req, res) => {
 });
 
 app.post("/api/agents/workflow", async (req, res) => {
+  const profile = req.body.profile || {};
   try {
-    const records = Array.isArray(req.body.records) ? req.body.records : [];
-    const profile = req.body.profile || {};
+    const suppliedRecords = Array.isArray(req.body.records) ? req.body.records : null;
+    const candidateRecords = suppliedRecords || await loadResearchCandidates();
 
-    const research = await researchAgent({ records });
+    const research = await researchAgent({ records: candidateRecords });
     log(research.agent, research.status, { count: research.count });
 
     const verification = await verificationAgent(research.records);
@@ -102,26 +107,56 @@ app.post("/api/agents/workflow", async (req, res) => {
     });
 
     await loadPathways();
-    const intelligence = assessmentAgent(profile);
+
+    const intelligence = careerIntelligenceAgent(profile);
     log(intelligence.agent, intelligence.status, {
-      hypotheses: intelligence.pathways.length
+      recommendations: intelligence.recommendations.length
+    });
+
+    const assessment = assessmentAgent(profile);
+    log("Assessment / Career Intelligence", assessment.status, {
+      hypotheses: assessment.pathways.length
     });
 
     const verified = verification.records.filter(r => r.verification_status === "verified" && r.is_active);
     const matching = matchingAgent(profile, verified);
     log(matching.agent, matching.status, { count: matching.matches.length });
 
-    const selectedPathway = req.body.pathway || intelligence.pathways[0]?.pathway || "";
+    const selectedPathway = req.body.pathway || assessment.pathways[0]?.pathway || "";
     const roadmap = roadmapAgent(profile, selectedPathway);
     log(roadmap.agent, roadmap.status, { pathway: roadmap.pathway });
 
+    let coach;
+    try {
+      coach = await careerCoach({
+        profile,
+        question: req.body.question || "Create a practical 90-day career roadmap from this profile.",
+        context: {
+          career_pathways: globalThis.__LEGALPATH_PATHWAYS__ || [],
+          assessment: assessment.pathways,
+          verified_opportunities: matching.matches
+        }
+      });
+      log(coach.agent, coach.status);
+    } catch (coachError) {
+      coach = {
+        agent: "Career Coach Agent",
+        status: "failed",
+        error: coachError.message,
+        grounded: false
+      };
+      log(coach.agent, coach.status, { error: coachError.message });
+    }
+
     res.json({
-      workflow: "research -> verification -> career intelligence -> matching -> career coach",
+      workflow: "research -> verification -> career intelligence -> opportunity matching -> career coach",
       research,
       verification,
       intelligence,
+      assessment,
       matching,
-      roadmap
+      roadmap,
+      coach
     });
   } catch (e) {
     res.status(400).json({ error: e.message });
