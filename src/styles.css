@@ -154,3 +154,70 @@
 
 /* Final grounded coach presentation */
 .aiCoachBox{margin-top:14px;padding:14px 15px;border:1px solid #dce3eb;border-radius:10px;background:#f6f8fa}.aiCoachBox small{display:block;font-size:8px;letter-spacing:1px;font-weight:900;color:#8f7447;margin-bottom:6px}.aiCoachBox p{margin:0!important;font-size:11px!important;line-height:1.65!important;color:#596a80;white-space:pre-wrap}.successBox{margin-top:14px}
+
+
+/* =========================
+   FINAL LEGALPATH VISUAL SYSTEM
+   ========================= */
+:root{--navy:#091a2f;--navy2:#102844;--ink:#18283d;--muted:#718096;--gold:#c8aa70;--line:#e3e8ef;--paper:#f7f8fa;--white:#fff;--green:#66866f}
+body{background:#f4f6f8;color:var(--ink)}
+.app{background:#f4f6f8}
+.side{width:274px;background:linear-gradient(180deg,#08182b 0%,#0d2037 58%,#0b1b30 100%);padding:24px 16px;border-right:1px solid #20334d}
+.brand{padding:2px 11px 30px}
+.mark{width:42px;height:42px;border-radius:12px;background:linear-gradient(145deg,#162d49,#0d1e34);box-shadow:inset 0 0 0 1px rgba(205,177,112,.22),0 8px 22px rgba(0,0,0,.16)}
+.brand b{font-size:21px;letter-spacing:-.7px}.brand small{letter-spacing:3.2px;color:#8999ae}
+.navLabel{font-size:8px;letter-spacing:2.1px;color:#61738b;padding:5px 13px 10px}
+.nav{padding:13px;border-radius:11px;color:#9eafc5;font-size:13px;margin:3px 0}
+.nav svg{width:17px}.nav.active{background:linear-gradient(90deg,#1b314d,#152943);box-shadow:inset 3px 0 0 var(--gold);color:#fff}
+.nav.active svg{color:var(--gold)}
+.sideCard{margin:25px 5px 0;padding:16px;border-radius:14px;background:rgba(255,255,255,.035);border:1px solid #263a54;box-shadow:0 15px 30px rgba(0,0,0,.08)}
+.sideCard b{font-size:11px}.sideCard span{font-size:10px;color:#8293aa;line-height:1.6}
+.sideFoot{padding:17px 10px 4px}.sideFoot span{font-size:8px;letter-spacing:1.8px}.sideFoot small{font-size:9px;line-height:1.5;color:#65778f}
+main{margin-left:274px;width:calc(100% - 274px);background:#f4f6f8}
+header{height:78px;padding:16px 46px;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);box-shadow:0 1px 0 rgba(20,36,57,.04)}
+.eyebrow{font-size:9px;letter-spacing:2.2px;color:#8793a5}
+.eyebrow+h1{font-size:20px;letter-spacing:-.5px}
+.headerStatus{padding:7px 10px;border:1px solid #e1e8e2;border-radius:999px;background:#f7faf7}
+.content{padding:34px 46px 70px;max-width:1440px}
+.pageIntro{margin-bottom:22px}.assessmentIntro{align-items:center}
+.pageIntro h2{font-size:36px;letter-spacing:-1.5px;line-height:1.12;color:#14263d;margin:7px 0 10px}
+.pageIntro p{font-size:13px;color:#78869a;max-width:760px;line-height:1.7}
+.journey{box-shadow:0 5px 18px rgba(21,38,61,.04)}
+.journey span{padding:7px 11px}.journey .journeyActive{background:#122942}
+.agentStrip{border-radius:17px;padding:18px 20px;margin-bottom:16px;background:linear-gradient(125deg,#0c1d32,#142b48);box-shadow:0 16px 34px rgba(10,27,48,.12)}
+.agentStripHead{margin-bottom:13px}.agentStripHead h3{font-size:17px}
+.agentPipeline{gap:7px}.pipelineAgent{min-height:100px;padding:11px;border-radius:10px;background:rgba(255,255,255,.035);border-color:#29415e;transition:.2s}
+.pipelineAgent:hover{transform:translateY(-1px);border-color:#6f8196}.pipelineAgent.done{background:#182f43;border-color:#876f45}
+.pipelineAgent b{font-size:9px}.pipelineAgent span{font-size:7.5px}.pipelineAgent small{font-size:7.5px}
+.agentFoot{margin-top:11px;padding-top:10px;font-size:8.5px}
+.assessmentGrid{grid-template-columns:minmax(410px,.88fr) minmax(520px,1.12fr);gap:16px}
+.assessmentForm,.assessmentResult{border-radius:16px;border-color:#e0e6ed;box-shadow:0 8px 30px rgba(25,43,65,.035)}
+.assessmentForm{padding:25px;background:#fff}.assessmentResult{padding:27px;background:#fff}
+.formSection{margin:2px 0 13px;padding:0 0 10px;border-bottom:1px solid #edf0f4}
+.formSection:not(:first-child){margin-top:20px}
+.formSection>span{background:#122942;color:#d2b67c;width:24px;height:24px}
+.formSection b{font-size:12px}.formSection small{font-size:9px}
+.assessmentForm input:not([type=range]),.assessmentForm select,.assessmentForm textarea{border-color:#dce3eb;background:#fcfdfe;border-radius:9px}
+.assessmentForm input:not([type=range]):hover,.assessmentForm select:hover,.assessmentForm textarea:hover{border-color:#c9d2de}
+.assessmentForm .primary.full{margin-top:4px;background:linear-gradient(135deg,#d1b477,#b99659);color:#17263b;box-shadow:0 10px 24px rgba(151,119,61,.18)}
+.resultHeader{padding-bottom:13px;border-bottom:1px solid #edf0f4}
+.resultHeader h3{letter-spacing:-.5px}
+.liveBadge{background:#f0f6f1;border:1px solid #dce9df}
+.resultStatus{background:#f5f8f5;border-color:#dce7df}
+.hypothesis{background:#fbfcfd;border-color:#e1e7ee;border-radius:12px}
+.hypothesis:hover{background:#fff;border-color:#c9ae76;box-shadow:0 10px 25px rgba(22,38,61,.06)}
+.hypothesisTop b{color:#1c3048}
+.signalGrid>div{background:#f5f7f9}
+.roadmapBox{background:linear-gradient(180deg,#fbfaf7,#fff);border-color:#e1e4e6;box-shadow:0 8px 24px rgba(35,49,64,.035)}
+.experimentGoal{background:#faf8f2;border-color:#e6ddcc}
+.successBox{background:#f5f9f6;border-color:#dce8df}
+.aiCoachBox{background:#f6f8fa;border-color:#dbe3eb}
+.bigGrid{gap:16px}.bigCard{border-radius:15px;box-shadow:0 7px 24px rgba(25,43,65,.035);transition:.2s}
+.bigCard:hover{box-shadow:0 14px 34px rgba(25,43,65,.08);transform:translateY(-3px)}
+.bigCard h3{letter-spacing:-.3px}.chips span{background:#f8fafb}
+.search{box-shadow:0 5px 18px rgba(25,43,65,.035)}
+.outlineBtn{background:#fff}.outlineBtn:hover{border-color:#c9ae76;color:#34465d}
+.modal{border-radius:20px;box-shadow:0 28px 90px rgba(4,14,27,.28)}
+@media(max-width:1100px){.side{width:250px}main{margin-left:250px;width:calc(100% - 250px)}.content{padding-left:28px;padding-right:28px}.assessmentGrid{grid-template-columns:1fr}.assessmentResult{order:2}}
+@media(max-width:900px){.side{width:274px}main{margin-left:0;width:100%}header{height:72px;padding:14px 20px}.content{padding:25px 20px 55px}.pageIntro h2{font-size:31px}.assessmentResult{order:-1}.agentPipeline{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){header{padding:13px 15px}.content{padding:20px 14px 45px}.pageIntro h2{font-size:27px}.pageIntro p{font-size:12px}.assessmentForm,.assessmentResult{padding:18px;border-radius:14px}.agentPipeline{grid-template-columns:1fr}.agentStrip{padding:15px}.journey{margin-top:13px}.headerStatus{display:none}.resultHeader h3{font-size:20px!important}}
