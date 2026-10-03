@@ -1,8 +1,25 @@
 {
-  "name":"legalpath-pakistan",
-  "private":true,
-  "version":"0.2.0",
-  "type":"module",
-  "scripts":{"dev":"vite","server":"node server/index.js","dev:full":"concurrently \"npm run server\" \"npm run dev\"","build":"vite build","preview":"vite preview"},
-  "dependencies":{"@vitejs/plugin-react":"latest","vite":"latest","react":"latest","react-dom":"latest","lucide-react":"latest","express":"latest","cors":"latest","dotenv":"latest","concurrently":"latest"}
+  "name": "legalpath-pakistan",
+  "private": true,
+  "version": "0.3.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "server": "node server/index.js",
+    "dev:full": "concurrently \"npm run server\" \"npm run dev\"",
+    "build": "vite build",
+    "start": "node server/index.js",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "latest",
+    "vite": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "lucide-react": "latest",
+    "express": "latest",
+    "cors": "latest",
+    "dotenv": "latest",
+    "concurrently": "latest"
+  }
 }
