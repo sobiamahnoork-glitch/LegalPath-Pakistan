@@ -1,6 +1,6 @@
 import { careerPathways as fallbackPathways, skills as fallbackSkills } from "./data.js";
 
-const url = process.env.SUPABASE_URL?.replace(/\/$/, "");
+const url = process.env.SUPABASE_URL?.replace(/\/$/, "").replace(/\/rest\/v1$/, "");
 const key = process.env.SUPABASE_ANON_KEY;
 
 export const supabaseConfigured = Boolean(url && key);
@@ -20,7 +20,7 @@ async function request(path) {
 
   if (!response.ok) {
     const body = await response.text();
-    throw new Error("Supabase request failed (" + response.status + "): " + body);
+    throw new Error("Supabase request failed (" + response.status + ") at " + url + "/rest/v1/" + path + ": " + body);
   }
 
   return response.json();
