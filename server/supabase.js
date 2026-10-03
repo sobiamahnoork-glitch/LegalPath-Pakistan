@@ -87,13 +87,50 @@ export async function getApprovedSourcesFromDb() {
 export async function getVerifiedOpportunitiesFromDb() {
   if (!supabaseConfigured) return [];
 
-  const rows = await request(
-    "opportunities?select=id,title,organisation,opportunity_type,description,location,remote_allowed,application_url,source_id,deadline,eligibility,verification_status,verified_at,last_verified_at,fingerprint,is_active&verification_status=eq.verified&is_active=eq.true&order=deadline.asc.nullslast"
-  );
+  const [rows, opportunitySkills, opportunityPathways, dbSkills, dbPathways] = await Promise.all([
+    request(
+      "opportunities?select=id,title,organisation,opportunity_type,description,location,remote_allowed,application_url,source_id,deadline,eligibility,verification_status,verified_at,last_verified_at,fingerprint,is_active&verification_status=eq.verified&is_active=eq.true&order=deadline.asc.nullslast"
+    ),
+    request("opportunity_skills?select=opportunity_id,skill_id,importance"),
+    request("opportunity_pathways?select=opportunity_id,pathway_id"),
+    request("skills?select=id,name"),
+    request("career_pathways?select=id,name")
+  ]);
+
+  const skillNames = new Map(dbSkills.map(row => [row.id, row.name]));
+  const pathwayNames = new Map(dbPathways.map(row => [row.id, row.name]));
 
   return rows.map(row => ({
     ...row,
     type: row.opportunity_type,
-    source_url: row.application_url || null
+    source_url: row.application_url || null,
+    skills: opportunitySkills
+      .filter(x => x.opportunity_id === row.id)
+      .map(x => skillNames.get(x.skill_id))
+      .filter(Boolean),
+    pathways: opportunityPathways
+      .filter(x => x.opportunity_id === row.id)
+      .map(x => pathwayNames.get(x.pathway_id))
+      .filter(Boolean)
   }));
+}
+
+export async function getResearchCandidatesFromDb() {
+  if (!supabaseConfigured) return [];
+
+  const [rows, approvedSources] = await Promise.all([
+    request(
+      "opportunities?select=id,title,organisation,opportunity_type,description,location,remote_allowed,application_url,source_id,deadline,eligibility,verification_status,verified_at,last_verified_at,fingerprint,is_active&order=created_at.desc"
+    ),
+    request("sources?select=id,name,url,source_type,authority_tier,is_approved&is_approved=eq.true")
+  ]);
+
+  const approved = new Map(approvedSources.map(source => [source.id, source]));
+  return rows
+    .filter(row => row.source_id ? approved.has(row.source_id) : Boolean(row.application_url))
+    .map(row => ({
+      ...row,
+      source_url: row.application_url || approved.get(row.source_id)?.url || null,
+      source_name: approved.get(row.source_id)?.name || null
+    }));
 }
