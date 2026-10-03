@@ -10,19 +10,16 @@ export function fingerprint(record){return crypto.createHash("sha256").update(JS
 
 const assessmentSignals={
   "Litigation & Advocacy":["advocacy","courtroom","public speaking","argument","criminal","civil","litigation"],
-  "Judicial Service":["judiciary","judicial","reasoning","judgment","procedure","current affairs"],
-  "Government Legal Service":["government","public policy","public law","policy","constitution","regulation"],
-  "Corporate / In-House Legal":["business","corporate","commercial","contracts","finance","compliance"],
-  "Arbitration & ADR":["arbitration","adr","negotiation","mediation","commercial","international"],
-  "International Law":["international","global","foreign affairs","treaty","human rights","diplomacy"],
-  "Human Rights & Public Interest":["human rights","social justice","gender","child rights","legal aid","ngo"],
-  "Environmental & Climate Law":["environment","climate","sustainability","energy","environmental justice"],
-  "Technology / IP / Cyber Law":["technology","cyber","data","privacy","intellectual property","software","ai"],
-  "Banking / Finance / Tax / Competition":["banking","finance","tax","competition","economics","business"],
-  "Legislative Drafting & Policy":["legislation","drafting","policy","research","government","regulation"],
-  "Legal Research, Academia & LegalTech":["research","writing","academia","teaching","technology","legal tech"]
-};
-
+  "Judiciary & Judicial Services":["judiciary","judicial","reasoning","judgment","procedure","current affairs"],
+  "Corporate & Commercial Law":["business","corporate","commercial","contracts","finance","compliance","transactions"],
+  "Government, Legislative & Regulatory Practice":["government","public policy","public law","policy","constitution","regulation","legislation"],
+  "Human Rights & Public Interest Law":["human rights","social justice","gender","child rights","legal aid","ngo","public interest"],
+  "International Law & International Organisations":["international","global","foreign affairs","treaty","human rights","diplomacy","humanitarian"],
+  "Alternative Dispute Resolution & Arbitration":["arbitration","adr","negotiation","mediation","commercial","dispute resolution"],
+  "Criminal Justice, Prosecution & Legal Investigation":["criminal","prosecution","investigation","evidence","forensic","criminal justice"],
+  "Tax, Banking, Finance & Compliance":["banking","finance","tax","competition","economics","business","compliance","aml"],
+  "Legal Academia, Research & Legal Technology":["research","writing","academia","teaching","technology","legal tech","ai","policy"]
+}
 export function assessmentAgent(profile={}){
   const values=[];
   for(const key of Object.keys(assessmentSignals)){
