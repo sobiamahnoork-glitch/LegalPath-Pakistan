@@ -166,13 +166,47 @@ app.post("/api/agents/workflow", async (req, res) => {
 });
 
 app.post("/api/agents/assessment", async (req, res) => {
+  const profile = req.body.profile || {};
   try {
-    await loadPathways();
-    const out = assessmentAgent(req.body.profile || {});
-    log(out.agent, out.status, {
-      hypotheses: out.pathways.length
+    const research = await researchAgent({ records: [] });
+    log("Research Agent", research.status, { count: research.count });
+
+    const verification = await verificationAgent(research.records);
+    log("Verification Agent", verification.status, {
+      verified: verification.verified,
+      rejected: verification.rejected,
+      active: verification.active
     });
-    res.json(out);
+
+    await loadPathways();
+
+    const intelligence = careerIntelligenceAgent(profile);
+    log("Career Intelligence Agent", intelligence.status, {
+      recommendations: intelligence.recommendations.length
+    });
+
+    const assessment = assessmentAgent(profile);
+    log("Career Intelligence Agent", assessment.status, {
+      hypotheses: assessment.pathways.length
+    });
+
+    const matching = matchingAgent(profile, []);
+    log("Opportunity Matching Agent", matching.status, { count: matching.matches.length });
+
+    res.json({
+      ...assessment,
+      workflow: {
+        agents_run: [
+          "Research Agent",
+          "Verification Agent",
+          "Career Intelligence Agent",
+          "Opportunity Matching Agent"
+        ],
+        agents_pending: ["Career Coach Agent"],
+        note: "Career Coach Agent runs when a pathway is selected for a 90-day experiment."
+      },
+      intelligence: intelligence.recommendations
+    });
   } catch (e) {
     res.status(400).json({ error: e.message });
   }
