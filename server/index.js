@@ -93,8 +93,10 @@ app.get("/api/opportunities", async (req, res) => {
 app.post("/api/agents/workflow", async (req, res) => {
   const profile = req.body.profile || {};
   try {
+    // Opportunities are intentionally empty until verified live data is available.
+    // The career assessment workflow must still run without querying the opportunities table.
     const suppliedRecords = Array.isArray(req.body.records) ? req.body.records : null;
-    const candidateRecords = suppliedRecords || await loadResearchCandidates();
+    const candidateRecords = suppliedRecords || [];
 
     const research = await researchAgent({ records: candidateRecords });
     log(research.agent, research.status, { count: research.count });
