@@ -263,39 +263,127 @@ export function roadmapAgent(profile = {}, pathway = "") {
   const pathways = asArray(globalThis.__LEGALPATH_PATHWAYS__);
   const selected = pathways.find(p => normalize(p.name) === normalizedPathway || normalize(p.id) === normalizedPathway);
   const gaps = selected ? scorePathway(selected, profile).skill_gaps : [];
+  const name = normalize(selected?.name || pathway);
 
-  const base = {
-    Explore: [
-      "Compare 2–3 pathways using their roles, skills and official-source context",
-      "Complete one small pathway-specific research or practical task",
-      "Attend one relevant academic, moot, clinic or professional activity",
-      "Start a focused CV/portfolio section with evidence from the experiment"
-    ],
-    Build: [
-      "Complete a pathway-specific research or practical project",
-      "Target a relevant internship, clerkship, research role or competition",
-      "Build one demonstrable skill and save evidence of the work",
-      "Review feedback and update the career hypothesis"
-    ],
-    Convert: [
-      "Target verified internships, junior roles, research positions or relevant postgraduate routes",
-      "Tailor the CV and applications to the selected pathway",
-      "Complete one portfolio-quality work sample",
-      "Track applications, feedback and evidence for the next iteration"
-    ]
-  };
+  const plans = [
+    {
+      match: /litigation/,
+      goal: "Build courtroom-readiness through a small litigation file: identify the issue, research the applicable law, draft a structured pleading and explain the evidence needed.",
+      actions: [
+        "Days 1–30: strengthen Pleading Drafting and Evidence Law by analysing the structure of a real, verified court document or approved legal source.",
+        "Days 31–60: complete a supervised or academic litigation exercise: issue-spotting, authorities, pleading outline and evidence plan.",
+        "Days 61–90: turn the work into a clean portfolio sample and record feedback on research, drafting and advocacy."
+      ]
+    },
+    {
+      match: /judiciary/,
+      goal: "Build judicial-reasoning evidence through structured legal research, statutory interpretation and judgment-style writing.",
+      actions: [
+        "Days 1–30: practise identifying issues, relevant provisions and authorities from verified legal materials.",
+        "Days 31–60: write a short judgment-style analysis for a defined legal problem, separating facts, issues, law, reasoning and conclusion.",
+        "Days 61–90: revise the work using feedback and preserve the research trail and final writing sample in your portfolio."
+      ]
+    },
+    {
+      match: /corporate/,
+      goal: "Build commercial-law evidence by moving from contract reading to drafting, negotiation and risk identification.",
+      actions: [
+        "Days 1–30: analyse a contract structure and identify commercial, regulatory and drafting risks.",
+        "Days 31–60: produce a supervised or academic contract clause exercise plus a short risk memo and negotiation points.",
+        "Days 61–90: refine the work into a portfolio sample showing contract interpretation, drafting and commercial reasoning."
+      ]
+    },
+    {
+      match: /government|legislative|regulatory/,
+      goal: "Build public-law and policy evidence by connecting legal research with legislation, regulation and practical policy analysis.",
+      actions: [
+        "Days 1–30: select a defined Pakistani public-law issue and map the relevant constitutional, statutory and regulatory sources.",
+        "Days 31–60: produce a short legislative or policy analysis identifying the problem, legal framework, options and implications.",
+        "Days 61–90: revise the work with feedback and preserve a concise policy/legal writing sample for your portfolio."
+      ]
+    },
+    {
+      match: /human rights|public interest/,
+      goal: "Build rights-based research and advocacy evidence around a clearly defined Pakistani human-rights or access-to-justice issue.",
+      actions: [
+        "Days 1–30: choose one issue and build a verified-source research file covering the applicable constitutional and legal framework.",
+        "Days 31–60: turn the research into a concise legal research note or policy brief with clearly sourced claims.",
+        "Days 61–90: seek supervised academic, clinic, competition or research feedback where genuinely available and preserve the final evidence."
+      ]
+    },
+    {
+      match: /international/,
+      goal: "Build international-law research evidence by connecting a defined issue to treaties, international rules and the relevant Pakistani legal context.",
+      actions: [
+        "Days 1–30: select one issue and map the applicable international instruments and verified Pakistani sources.",
+        "Days 31–60: prepare a structured comparative research note explaining the legal framework and its practical implications.",
+        "Days 61–90: edit the note into a professional writing sample and document the sources, reasoning and feedback."
+      ]
+    },
+    {
+      match: /arbitration|alternative dispute/,
+      goal: "Build dispute-resolution evidence by learning to analyse a dispute, interpret agreement terms and design negotiation, mediation or arbitration strategies.",
+      actions: [
+        "Days 1–30: study a defined dispute scenario and identify the dispute, relevant contract terms, procedural route and evidence needed.",
+        "Days 31–60: complete a negotiation/mediation or arbitration exercise with a written strategy and outcome analysis.",
+        "Days 61–90: consolidate the exercise into a portfolio sample showing dispute analysis, communication and ADR reasoning."
+      ]
+    },
+    {
+      match: /criminal/,
+      goal: "Build criminal-justice evidence through structured analysis of offences, procedure, evidence and investigative issues.",
+      actions: [
+        "Days 1–30: choose a defined criminal-law problem and map the applicable offence, procedure and evidentiary framework from verified sources.",
+        "Days 31–60: complete a supervised or academic case-analysis exercise covering issues, evidence and procedural steps.",
+        "Days 61–90: refine the analysis into a portfolio sample and record feedback on research and criminal-procedure reasoning."
+      ]
+    },
+    {
+      match: /tax|banking|finance|compliance/,
+      goal: "Build regulatory and financial-law evidence by connecting a defined transaction or compliance problem to the applicable legal framework.",
+      actions: [
+        "Days 1–30: choose one tax, banking, finance or compliance issue and map the relevant verified legal/regulatory sources.",
+        "Days 31–60: prepare a short risk or compliance memo explaining the issue, obligations and practical controls.",
+        "Days 61–90: refine the memo into a professional work sample and document the legal sources and feedback."
+      ]
+    },
+    {
+      match: /academia|research|legal technology/,
+      goal: "Build research and legal-technology evidence through a rigorous legal research project and a practical technology-supported output.",
+      actions: [
+        "Days 1–30: define a focused research question and build a source map using verified legal materials.",
+        "Days 31–60: produce a structured research note and use an appropriate legal-technology workflow to organise, analyse or present the evidence.",
+        "Days 61–90: revise the output, document methodology and preserve the final research/technology sample in your portfolio."
+      ]
+    }
+  ];
 
-  const gapStep = gaps.length
-    ? `Prioritise these skill gaps: ${gaps.slice(0, 3).join(", ")}`
-    : "Record evidence for the skills you already use and identify the next skill to strengthen";
+  const plan = plans.find(x => x.match.test(name));
+  const goal = plan?.goal || "Build evidence for the selected pathway through a focused research or practical project tied to its core skills.";
+  const actions = plan?.actions || [
+    "Days 1–30: define a focused pathway question and strengthen the highest-priority skill gap using verified learning and legal sources.",
+    "Days 31–60: complete a practical or academic project that demonstrates the selected pathway skills.",
+    "Days 61–90: refine the work with feedback and preserve a professional evidence sample in your portfolio."
+  ];
+
+  const priority = gaps.length ? gaps.slice(0, 4) : (selected?.skills || []).slice(0, 4);
 
   return {
     agent: "Career Coach Agent",
     status: "completed",
     pathway: selected?.name || pathway,
     stage,
+    experiment_goal: goal,
     skill_gaps: gaps,
-    next_90_days: [gapStep, ...(base[stage] || base.Explore).slice(0, 3)],
+    priority_skills: priority,
+    next_90_days: actions,
+    success_indicators: [
+      "One completed pathway-specific work sample",
+      "Clear evidence of at least one strengthened priority skill",
+      "Documented feedback or reflection on what changed",
+      "A portfolio-ready record of the experiment"
+    ],
     principle: "The roadmap is a practical experiment plan; it should be updated as the student's evidence and interests change."
   };
 }
+
