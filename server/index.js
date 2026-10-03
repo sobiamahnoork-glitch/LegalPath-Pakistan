@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import express from "express";
 import cors from "cors";
 import { careerPathways, skills, opportunities } from "./data.js";
+import { getCareerPathwaysFromDb, getSkillsFromDb, getApprovedSourcesFromDb, supabaseConfigured } from "./supabase.js";
 import { researchAgent, verificationAgent, careerIntelligenceAgent, matchingAgent, fingerprint, assessmentAgent, roadmapAgent } from "./agents.js";
 import { careerCoach } from "./ai.js";
 
@@ -33,15 +34,41 @@ app.get("/api/health", (req, res) =>
   res.json({
     ok: true,
     service: "LegalPath Pakistan API",
-    database: "not connected",
+    database: supabaseConfigured ? "configured" : "not configured",
     ai: !!process.env.GEMINI_API_KEY,
-    version: "0.3.0"
+    version: "0.4.0"
   })
 );
 
-app.get("/api/career-pathways", (req, res) => res.json({ data: careerPathways }));
-app.get("/api/skills", (req, res) => res.json({ data: skills }));
-app.get("/api/opportunities", (req, res) => res.json({ data: opportunities }));
+app.get("/api/career-pathways", async (req, res) => {
+  try {
+    const data = await getCareerPathwaysFromDb();
+    globalThis.__LEGALPATH_PATHWAYS__ = data;
+    res.json({ data, source: supabaseConfigured ? "supabase" : "fallback" });
+  } catch (e) {
+    res.status(503).json({ error: e.message });
+  }
+});
+
+app.get("/api/skills", async (req, res) => {
+  try {
+    const data = await getSkillsFromDb();
+    res.json({ data, source: supabaseConfigured ? "supabase" : "fallback" });
+  } catch (e) {
+    res.status(503).json({ error: e.message });
+  }
+});
+
+app.get("/api/sources", async (req, res) => {
+  try {
+    const data = await getApprovedSourcesFromDb();
+    res.json({ data, source: supabaseConfigured ? "supabase" : "fallback" });
+  } catch (e) {
+    res.status(503).json({ error: e.message });
+  }
+});
+
+app.get("/api/opportunities", (req, res) => res.json({ data: opportunities, source: "static" }));
 
 
 app.post("/api/agents/workflow", async (req, res) => {
@@ -59,6 +86,8 @@ app.post("/api/agents/workflow", async (req, res) => {
       rejected: verification.rejected
     });
 
+    const pathways = await getCareerPathwaysFromDb();
+    globalThis.__LEGALPATH_PATHWAYS__ = pathways;
     const intelligence = assessmentAgent(profile);
     log(intelligence.agent, intelligence.status, {
       hypotheses: intelligence.pathways.length
@@ -86,6 +115,7 @@ app.post("/api/agents/workflow", async (req, res) => {
 
 app.post("/api/agents/assessment", (req, res) => {
   try {
+    globalThis.__LEGALPATH_PATHWAYS__ = await getCareerPathwaysFromDb();
     const out = assessmentAgent(req.body.profile || {});
     log(out.agent, out.status, { hypotheses: out.pathways.length });
     res.json(out);
@@ -126,6 +156,7 @@ app.post("/api/agents/verify", async (req, res) => {
 
 app.post("/api/agents/career-intelligence", async (req, res) => {
   try {
+    globalThis.__LEGALPATH_PATHWAYS__ = await getCareerPathwaysFromDb();
     const out = careerIntelligenceAgent(req.body.profile || {});
     log(out.agent, out.status);
     res.json(out);
