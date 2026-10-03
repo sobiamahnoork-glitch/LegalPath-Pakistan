@@ -81,3 +81,55 @@
  .assessmentForm input:not([type="range"]),.assessmentForm select,.assessmentForm textarea{font-size:13px}
  .resultScrollCue{font-size:9px}
 }
+
+
+/* Professional result typography */
+.assessmentResult{padding:30px;min-height:560px}
+.assessmentResult .eyebrow{font-size:11px}
+.assessmentResult .resultHeader h3{font-size:25px;line-height:1.2;margin:6px 0}
+.assessmentResult .resultLead{font-size:14px!important;line-height:1.65;max-width:720px}
+.assessmentResult .resultStatus{padding:15px 17px;margin:19px 0}
+.assessmentResult .resultStatus b{font-size:13px}
+.assessmentResult .resultStatus span{font-size:12px;line-height:1.5}
+.assessmentResult .hypothesis{padding:20px;gap:16px;border-radius:14px}
+.assessmentResult .hypothesisTop{gap:10px}
+.assessmentResult .hypothesisTop b{font-size:15px;line-height:1.35}
+.assessmentResult .rank{font-size:11px}
+.assessmentResult .signalBadge{font-size:10px;padding:5px 9px}
+.assessmentResult .hypothesis p{font-size:13px!important;line-height:1.65;margin:10px 0 13px}
+.assessmentResult .signalGrid{gap:10px}
+.assessmentResult .signalGrid>div{padding:11px}
+.assessmentResult .signalGrid small{font-size:9px;letter-spacing:1px;margin-bottom:5px}
+.assessmentResult .signalGrid span{font-size:11px;line-height:1.6}
+.assessmentResult .evidence{font-size:11px;line-height:1.6;margin-top:12px;padding-top:11px}
+.assessmentResult .evidence small{font-size:9px}
+.resultScrollCue{font-size:11px!important;padding:12px 14px;margin-top:18px}
+.assessmentResult .roadmapBox{margin-top:20px;padding:21px;border-radius:15px}
+.assessmentResult .roadmapHead h4{font-size:19px;line-height:1.3}
+.assessmentResult .roadmapHead p{font-size:12px;margin-top:3px}
+.assessmentResult .roadmapHead>span{font-size:10px;padding:6px 9px}
+.assessmentResult .coachRole{font-size:11px;line-height:1.6;padding:11px 12px;margin:15px 0}
+.assessmentResult .roadmapBox>p{font-size:11px!important;line-height:1.65}
+.assessmentResult .roadmapBox>p b{font-size:9px}
+.assessmentResult .roadSteps{gap:9px}
+.assessmentResult .roadStep{font-size:12px;line-height:1.6;padding:13px}
+.assessmentResult .roadStep small{font-size:9px;letter-spacing:.9px;margin-bottom:4px}
+.assessmentResult .resultEmpty{padding:35px 24px;min-height:260px}
+.assessmentResult .resultEmpty b{font-size:15px}
+.assessmentResult .resultEmpty span{font-size:12px;line-height:1.55;max-width:420px}
+
+@media(max-width:900px){
+ .assessmentResult{padding:24px}
+}
+@media(max-width:620px){
+ .assessmentResult{padding:19px}
+ .assessmentResult .resultHeader h3{font-size:21px}
+ .assessmentResult .resultLead{font-size:13px!important}
+ .assessmentResult .hypothesis{padding:16px}
+ .assessmentResult .hypothesisTop b{font-size:14px}
+ .assessmentResult .hypothesis p{font-size:12px!important}
+ .assessmentResult .signalGrid span{font-size:11px}
+ .assessmentResult .evidence{font-size:10px}
+ .assessmentResult .roadmapHead{display:block}
+ .assessmentResult .roadmapHead>span{display:inline-block;margin-top:8px}
+}
