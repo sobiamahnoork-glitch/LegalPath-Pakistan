@@ -91,7 +91,7 @@ function Assessment({go}){
        {p.evidence?.length>0&&<div className="evidence"><Lightbulb size={13}/><span><b>Why it appeared:</b> {p.evidence.slice(0,5).map(e=>typeof e==="string"?e:(e.value||e.type||"signal")).join(" · ")}</span></div>}
       </div><ChevronRight size={18}/>
     </button>)}
-    {!result&&<div className="resultEmpty"><Target size={24}/><b>Your results will appear here</b><span>You'll get pathway signals, matched skills, skill gaps and a next-step experiment.</span></div>}
+    {result?.pathways?.length>0&&!roadmap&&<div className="resultScrollCue"><ChevronDown size={14}/> Select a pathway above to open the Legal Career Coach 90-day experiment.</div>}{!result&&<div className="resultEmpty"><Target size={24}/><b>Your results will appear here</b><span>You'll get pathway signals, matched skills, skill gaps and a next-step experiment.</span></div>}
     {roadmap&&<div className="roadmapBox"><div className="roadmapHead"><div><span className="eyebrow">STEP 03 · PREPARE</span><h4><Sparkles size={15}/> Legal Career Coach Agent</h4><p>90-day experiment · {roadmap.pathway}</p></div><span>{roadmap.stage}</span></div><div className="coachRole"><ShieldCheck size={14}/><span>Role: turn the selected pathway into a practical, evidence-building career experiment.</span></div>{roadmap.skill_gaps?.length>0&&<p><b>Priority skill gaps</b><br/>{roadmap.skill_gaps.join(" · ")}</p>}<div className="roadSteps">{roadmap.next_90_days.map((x,i)=><div className="roadStep" key={x}><span>{String(i+1).padStart(2,"0")}</span><div><small>90-DAY ACTION</small>{x}</div></div>)}</div></div>}
    </div>
   </div>
