@@ -120,7 +120,7 @@ export async function getResearchCandidatesFromDb() {
 
   const [rows, approvedSources] = await Promise.all([
     request(
-      "opportunities?select=id,title,organisation,opportunity_type,description,location,remote_allowed,application_url,source_id,deadline,eligibility,verification_status,verified_at,last_verified_at,fingerprint,is_active&order=created_at.desc"
+      "opportunities?select=id,title,organisation,opportunity_type,description,location,remote_allowed,application_url,source_id,deadline,eligibility,verification_status,verified_at,last_verified_at,fingerprint,is_active"
     ),
     request("sources?select=id,name,url,source_type,authority_tier,is_approved&is_approved=eq.true")
   ]);
