@@ -475,3 +475,70 @@ main{min-width:0}
 @media (min-width:1440px){
   .content{max-width:1360px}
 }
+
+
+/* Final responsive fix: mobile browsers using desktop-site viewport must use the full screen */
+@media (max-width:1100px){
+  html,body,#root,.app{width:100%;min-width:0}
+  .side{
+    width:278px;
+    transform:translateX(-100%);
+    transition:transform .2s ease;
+    box-shadow:12px 0 35px rgba(0,0,0,.14);
+  }
+  .side.open{transform:translateX(0)}
+  main{
+    width:100%;
+    margin-left:0;
+    min-width:0;
+  }
+  header{
+    width:100%;
+    padding-left:18px;
+    padding-right:18px;
+  }
+  .hamb{display:block}
+  .content{
+    width:100%;
+    max-width:none;
+    margin:0;
+    padding-left:20px;
+    padding-right:20px;
+  }
+  .assessmentGrid{
+    grid-template-columns:minmax(0,1fr);
+  }
+  .assessmentResult{order:-1}
+  .agentPipeline{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .coachGrid,.lower{grid-template-columns:minmax(0,1fr)}
+  .pathGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .bigGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+@media (max-width:700px){
+  .content{padding:18px 14px 40px}
+  header{min-height:68px;height:auto;padding:12px 14px}
+  .headerLeft{min-width:0;max-width:100%}
+  .headerLeft>div{min-width:0}
+  .eyebrow+h1{font-size:18px;white-space:normal;overflow-wrap:anywhere}
+  .pageIntro h2{font-size:30px;line-height:1.1}
+  .assessmentForm,.assessmentResult{width:100%;padding:16px}
+  .agentStrip{width:100%;padding:14px}
+  .agentPipeline{grid-template-columns:minmax(0,1fr)}
+  .pathGrid,.bigGrid{grid-template-columns:minmax(0,1fr)}
+  .mapTools{display:block}
+  .search{width:100%;min-width:0}
+  .toolNote{margin-top:9px}
+  .journey{max-width:100%;overflow-x:auto}
+  .assessmentIntro{display:block}
+  .actions{flex-direction:column}
+  .actions>*{width:100%}
+}
+
+@media (max-width:380px){
+  .content{padding-left:10px;padding-right:10px}
+  header{padding-left:10px;padding-right:10px}
+  .assessmentForm,.assessmentResult{padding:13px}
+  .agentStrip{padding:12px}
+  .pageIntro h2{font-size:27px}
+}
