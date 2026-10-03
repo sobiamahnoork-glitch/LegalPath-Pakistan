@@ -133,3 +133,16 @@
  .assessmentResult .roadmapHead{display:block}
  .assessmentResult .roadmapHead>span{display:inline-block;margin-top:8px}
 }
+
+/* Final product polish */
+.requiredMark{font-style:normal;font-size:9px;font-weight:800;color:#a3844d;margin-left:5px;letter-spacing:.3px}
+.assessmentForm>label{display:flex!important;align-items:center;justify-content:space-between}
+.assessmentForm .primary.full{min-height:48px;border-radius:11px;font-size:12px;font-weight:850;letter-spacing:.1px;box-shadow:0 9px 22px rgba(23,40,64,.12)}
+.assessmentForm .primary.full:disabled{opacity:.72;cursor:wait}
+.hypothesis:focus-visible,.outlineBtn:focus-visible,.primary:focus-visible,.nav:focus-visible{outline:3px solid #d9c59b;outline-offset:2px}
+.experimentGoal{margin:14px 0;padding:13px 14px;border:1px solid #ded5c2;background:#faf8f2;border-radius:10px}
+.experimentGoal small,.successBox>small{display:block;font-size:8px;letter-spacing:1px;font-weight:900;color:#967b4b;margin-bottom:5px}
+.experimentGoal b{display:block;font-size:12px;line-height:1.6;color:#3e5068}
+.successBox{margin-top:14px;padding:13px 14px;border:1px solid #dce6df;background:#f5f8f5;border-radius:10px}
+.successBox span{display:flex;gap:7px;align-items:flex-start;font-size:10px;line-height:1.5;color:#627388;margin-top:6px}
+.successBox svg{color:#66856f;flex-shrink:0;margin-top:1px}
