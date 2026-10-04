@@ -295,8 +295,7 @@ app.post("/api/agents/assessment", async (req, res) => {
           "Research Agent",
           "Verification Agent",
           "Career Intelligence Agent",
-          "Opportunity Matching Agent",
-          "Career Coach Agent"
+          "Opportunity Matching Agent"
         ],
         agents_pending: ["Career Coach Agent"],
         note: "Career Coach remains pending until the student selects a pathway and starts its 90-day experiment."
