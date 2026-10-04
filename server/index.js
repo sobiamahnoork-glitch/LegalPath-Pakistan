@@ -212,6 +212,7 @@ app.post("/api/agents/assessment", async (req, res) => {
     // Match only opportunities that passed the verification step.
     const verified = verification.records.filter(r => r.verification_status === "verified" && r.is_active);
     const matching = matchingAgent(profile, verified);
+    const approvedSources = await getApprovedSourcesFromDb();
     log("Opportunity Matching Agent", matching.status, { count: matching.matches.length });
 
     // The fifth agent now runs as part of the assessment itself.
