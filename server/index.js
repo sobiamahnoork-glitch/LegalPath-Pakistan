@@ -44,15 +44,30 @@ async function loadResearchCandidates() {
   return supabaseConfigured ? getResearchCandidatesFromDb() : opportunities;
 }
 
-app.get("/api/health", (req, res) =>
-  res.json({
+app.get("/api/health", async (req, res) => {
+  const health = {
     ok: true,
     service: "LegalPath Pakistan API",
     database: supabaseConfigured ? "configured" : "not configured",
     ai: !!process.env.GEMINI_API_KEY,
-    version: "0.5.0"
-  })
-);
+    version: "0.6.0"
+  };
+
+  if (supabaseConfigured) {
+    try {
+      await getApprovedSourcesFromDb();
+      health.database_reachable = true;
+    } catch (error) {
+      health.ok = false;
+      health.database_reachable = false;
+      health.database_error = error.message;
+    }
+  } else {
+    health.database_reachable = false;
+  }
+
+  res.status(health.ok ? 200 : 503).json(health);
+});
 
 app.get("/api/career-pathways", async (req, res) => {
   try {
@@ -161,7 +176,11 @@ app.post("/api/agents/workflow", async (req, res) => {
       coach
     });
   } catch (e) {
-    res.status(400).json({ error: e.message });
+    console.error("[workflow] failed:", e);
+    res.status(503).json({
+      error: e.message || "Workflow service failed",
+      code: "WORKFLOW_BACKEND_ERROR"
+    });
   }
 });
 
@@ -267,7 +286,11 @@ app.post("/api/agents/assessment", async (req, res) => {
       coach
     });
   } catch (e) {
-    res.status(400).json({ error: e.message });
+    console.error("[assessment] failed:", e);
+    res.status(503).json({
+      error: e.message || "Assessment service failed",
+      code: "ASSESSMENT_BACKEND_ERROR"
+    });
   }
 });
 
@@ -417,7 +440,8 @@ app.use((req, res) => {
 
 export { app };
 
-// Start the Express server only when running the Node server directly.
+// Vercel imports the Express app as a serverless handler.
+// Local/Deplexo deployments start the HTTP listener below.
 // On Vercel, api/[...path].js imports the app as a serverless function.
 if (process.env.VERCEL !== "1") {
   app.listen(port, "0.0.0.0", () => console.log(`LegalPath API + web app running on port ${port}`));
