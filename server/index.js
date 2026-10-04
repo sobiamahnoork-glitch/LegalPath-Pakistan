@@ -173,7 +173,7 @@ app.post("/api/agents/workflow", async (req, res) => {
     log(matching.agent, matching.status, { count: matching.matches.length });
 
     const selectedPathway = req.body.pathway || assessment.pathways[0]?.pathway || "";
-    const roadmap = roadmapAgent(profile, selectedPathway);
+    const roadmap = roadmapAgent(profile, selectedPathway, loadedPathways);
     log(roadmap.agent, roadmap.status, { pathway: roadmap.pathway });
 
     let coach;
@@ -398,7 +398,8 @@ app.post("/api/agents/verify", async (req, res) => {
 app.post("/api/agents/career-intelligence", async (req, res) => {
   try {
     await loadPathways();
-    const out = careerIntelligenceAgent(req.body.profile || {});
+    const loadedPathways = await loadPathways();
+    const out = careerIntelligenceAgent(req.body.profile || {}, loadedPathways);
     log(out.agent, out.status);
     res.json(out);
   } catch (e) {
