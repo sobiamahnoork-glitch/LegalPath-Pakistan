@@ -77,6 +77,18 @@ async function loadApprovedSources() {
   }
 }
 
+function normalizeValue(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function filterRelevantSources(sources, pathway, relevantOpportunities) {
+  const sourceIds = new Set(asArray(relevantOpportunities).map(item => item.source_id).filter(Boolean));
+  const pathwaySourceUrl = normalizeValue(pathway?.source_url);
+  return asArray(sources).filter(source =>
+    sourceIds.has(source.id) || (pathwaySourceUrl && normalizeValue(source.url) === pathwaySourceUrl)
+  );
+}
+
 app.get("/api/health", async (req, res) => {
   const health = {
     ok: true,
@@ -169,11 +181,10 @@ app.post("/api/agents/workflow", async (req, res) => {
     });
 
     const verified = verification.records.filter(r => r.verification_status === "verified" && r.is_active);
-    const matching = matchingAgent(profile, verified);
-    const approvedSources = await loadApprovedSources();
-    log(matching.agent, matching.status, { count: matching.matches.length });
-
     const selectedPathway = req.body.pathway || assessment.pathways[0]?.pathway || "";
+    const matching = matchingAgent(profile, verified, selectedPathway);
+    const approvedSources = await loadApprovedSources();
+    log(matching.agent, matching.status, { count: matching.matches.length, pathway: selectedPathway });
     const roadmap = roadmapAgent(profile, selectedPathway, loadedPathways);
     log(roadmap.agent, roadmap.status, { pathway: roadmap.pathway });
 
@@ -262,45 +273,15 @@ app.post("/api/agents/assessment", async (req, res) => {
       hypotheses: assessment.pathways.length
     });
 
-    // Match only opportunities that passed the verification step.
+    // Match only verified opportunities relevant to the strongest pathway.
+    // Career Coach remains pending until the student explicitly selects a pathway.
     const verified = verification.records.filter(r => r.verification_status === "verified" && r.is_active);
-    const matching = matchingAgent(profile, verified);
-    const approvedSources = await getApprovedSourcesFromDb();
-    log("Opportunity Matching Agent", matching.status, { count: matching.matches.length });
-
-    // The fifth agent now runs as part of the assessment itself.
-    // It uses the strongest exploration hypothesis as the initial experiment,
-    // while the UI can still rebuild the experiment when another pathway is selected.
     const selectedPathway = assessment.pathways[0]?.pathway || "";
-    const roadmap = roadmapAgent(profile, selectedPathway, loadedPathways);
+    const matching = matchingAgent(profile, verified, selectedPathway);
+    log("Opportunity Matching Agent", matching.status, { count: matching.matches.length, pathway: selectedPathway });
 
-    // Keep the structured roadmap as the deterministic layer and add
-    // grounded Gemini coaching from the same supplied career context.
-    let coach;
-    try {
-      coach = await careerCoach({
-        profile,
-        question: "Turn the strongest pathway signal into concise, practical career guidance for the next 90 days.",
-        context: {
-          career_pathways: globalThis.__LEGALPATH_PATHWAYS__ || [],
-          selected_pathway: selectedPathway,
-          assessment: assessment.pathways,
-          structured_roadmap: roadmap,
-          approved_sources: approvedSources,
-          verified_opportunities: matching.matches
-        }
-      });
-      log("Career Coach Agent", coach.status, { pathway: roadmap.pathway, grounded: true });
-    } catch (coachError) {
-      coach = {
-        agent: "Career Coach Agent",
-        status: "fallback",
-        error: coachError.message,
-        grounded: false,
-        answer: "The structured 90-day experiment is ready. AI narrative coaching will appear when the Gemini service is configured."
-      };
-      log("Career Coach Agent", coach.status, { pathway: roadmap.pathway, grounded: false });
-    }
+    const roadmap = null;
+    const coach = null;
 
     const pathwayHypotheses = Array.isArray(assessment.pathways) ? assessment.pathways : [];
     if (!pathwayHypotheses.length) throw new Error("Assessment produced no pathway hypotheses");
@@ -317,8 +298,8 @@ app.post("/api/agents/assessment", async (req, res) => {
           "Opportunity Matching Agent",
           "Career Coach Agent"
         ],
-        agents_pending: [],
-        note: "The Career Coach Agent combines a structured pathway experiment with grounded AI coaching. Selecting another pathway rebuilds the experiment for that pathway."
+        agents_pending: ["Career Coach Agent"],
+        note: "Career Coach remains pending until the student selects a pathway and starts its 90-day experiment."
       },
       intelligence: intelligence.recommendations,
       roadmap,
@@ -335,12 +316,19 @@ app.post("/api/agents/assessment", async (req, res) => {
 
 app.post("/api/agents/roadmap", async (req, res) => {
   try {
-    await loadPathways();
+    const loadedPathways = await loadPathways();
     const profile = req.body.profile || {};
     const pathway = req.body.pathway || "";
-    const out = roadmapAgent(profile, pathway, globalThis.__LEGALPATH_PATHWAYS__ || []);
-    const verifiedOpportunities = await loadOpportunities();
-    const approvedSources = await getApprovedSourcesFromDb();
+    if (!pathway) throw new Error("A selected career pathway is required");
+    const selectedPathway = loadedPathways.find(p => normalizeValue(p.name) === normalizeValue(pathway) || normalizeValue(p.id) === normalizeValue(pathway));
+    if (!selectedPathway) throw new Error("Selected career pathway was not found in the active database pathway library");
+    const out = roadmapAgent(profile, selectedPathway.name, loadedPathways);
+    const allVerifiedOpportunities = await loadOpportunities();
+    const verifiedOpportunities = allVerifiedOpportunities.filter(o =>
+      asArray(o.pathways || o.pathway).some(name => normalizeValue(name) === normalizeValue(selectedPathway.name))
+    );
+    const approvedSources = await loadApprovedSources();
+    const relevantSources = filterRelevantSources(approvedSources, selectedPathway, verifiedOpportunities);
 
     let coach;
     try {
@@ -351,7 +339,7 @@ app.post("/api/agents/roadmap", async (req, res) => {
           career_pathways: globalThis.__LEGALPATH_PATHWAYS__ || [],
           selected_pathway: out.pathway,
           structured_roadmap: out,
-          approved_sources: approvedSources,
+          approved_sources: relevantSources,
           verified_opportunities: verifiedOpportunities
         }
       });
@@ -371,7 +359,7 @@ app.post("/api/agents/roadmap", async (req, res) => {
       pathway: out.pathway,
       coach: coach.status
     });
-    res.json({ ...out, coach });
+    res.json({ ...out, coach, opportunities: verifiedOpportunities, sources: relevantSources });
   } catch (e) {
     res.status(400).json({ error: e.message });
   }
@@ -403,7 +391,6 @@ app.post("/api/agents/verify", async (req, res) => {
 
 app.post("/api/agents/career-intelligence", async (req, res) => {
   try {
-    await loadPathways();
     const loadedPathways = await loadPathways();
     const out = careerIntelligenceAgent(req.body.profile || {}, loadedPathways);
     log(out.agent, out.status);
@@ -418,7 +405,7 @@ app.post("/api/agents/match", async (req, res) => {
     const live = await loadOpportunities();
     const supplied = Array.isArray(req.body.opportunities) ? req.body.opportunities : null;
     const source = supplied || live;
-    const out = matchingAgent(req.body.profile || {}, source);
+    const out = matchingAgent(req.body.profile || {}, source, req.body.pathway || "");
     log(out.agent, out.status, { count: out.matches.length });
     res.json(out);
   } catch (e) {
