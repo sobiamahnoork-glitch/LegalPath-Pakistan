@@ -1,13 +1,14 @@
 {
   "name": "legalpath-pakistan",
   "private": true,
-  "version": "0.3.0",
+  "version": "0.4.0",
   "type": "module",
   "scripts": {
     "dev": "concurrently \"npm run server\" \"vite\"",
     "server": "node server/index.js",
     "dev:full": "npm run dev",
     "build": "vite build",
+    "prestart": "npm run build",
     "start": "node server/index.js",
     "preview": "vite preview"
   },
