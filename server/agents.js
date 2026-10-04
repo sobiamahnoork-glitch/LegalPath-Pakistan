@@ -274,7 +274,7 @@ export function fingerprint(record) {
   return crypto.createHash("sha256").update(JSON.stringify(record)).digest("hex");
 }
 
-export function roadmapAgent(profile = {}, pathway = "") {
+export function roadmapAgent(profile = {}, pathway = "", suppliedPathways = null) {
   const year = String(profile.year || profile.semester || "").toLowerCase();
   const stage = year.includes("1") || year.includes("2")
     ? "Explore"
@@ -285,7 +285,7 @@ export function roadmapAgent(profile = {}, pathway = "") {
         : "Explore";
 
   const normalizedPathway = normalize(pathway);
-  const pathways = asArray(globalThis.__LEGALPATH_PATHWAYS__);
+  const pathways = asArray(suppliedPathways ?? globalThis.__LEGALPATH_PATHWAYS__);
   const selected = pathways.find(p => normalize(p.name) === normalizedPathway || normalize(p.id) === normalizedPathway);
   const gaps = selected ? scorePathway(selected, profile).skill_gaps : [];
   const name = normalize(selected?.name || pathway);
