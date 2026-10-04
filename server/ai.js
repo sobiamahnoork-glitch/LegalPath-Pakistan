@@ -1,6 +1,31 @@
 export async function careerCoach({profile,question,context}){
-const key=process.env.GEMINI_API_KEY;if(!key)throw new Error("GEMINI_API_KEY is not configured");
-const prompt=`You are LegalPath Pakistan's grounded legal career coach. Use ONLY the supplied context. Do not invent Pakistani vacancies, deadlines, laws, organisations or qualifications. If context is insufficient, say so. Student profile: ${JSON.stringify(profile||{})}. Question: ${question||"Create a practical career roadmap."}. Verified system context: ${JSON.stringify(context||{})}. Give concise actionable advice.`;
-const res=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key="+encodeURIComponent(key),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})});
-if(!res.ok)throw new Error("Gemini API request failed: "+res.status);
-const data=await res.json();return{agent:"Career Coach Agent",status:"completed",answer:data.candidates?.[0]?.content?.parts?.[0]?.text||"No answer returned.",grounded:true};}
+  const key=process.env.GEMINI_API_KEY;
+  if(!key)throw new Error("GEMINI_API_KEY is not configured");
+
+  const prompt=`You are LegalPath Pakistan's grounded legal career coach. Use ONLY the supplied context. Do not invent Pakistani vacancies, deadlines, laws, organisations or qualifications. If context is insufficient, say so. Student profile: ${JSON.stringify(profile||{})}. Question: ${question||"Create a practical career roadmap."}. Verified system context: ${JSON.stringify(context||{})}. Give concise actionable advice.`;
+
+  const controller=new AbortController();
+  const timeout=setTimeout(()=>controller.abort(),7000);
+  let res;
+  try{
+    res=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key="+encodeURIComponent(key),{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({contents:[{parts:[{text:prompt}]}]}),
+      signal:controller.signal
+    });
+  }catch(error){
+    throw new Error(error.name==="AbortError"?"Gemini API request timed out":error.message);
+  }finally{
+    clearTimeout(timeout);
+  }
+
+  if(!res.ok)throw new Error("Gemini API request failed: "+res.status);
+  const data=await res.json();
+  return {
+    agent:"Career Coach Agent",
+    status:"completed",
+    answer:data.candidates?.[0]?.content?.parts?.[0]?.text||"No answer returned.",
+    grounded:true
+  };
+}
