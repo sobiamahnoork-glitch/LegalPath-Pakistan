@@ -415,4 +415,4 @@ app.use((req, res) => {
   res.status(404).json({ error: "Route not found" });
 });
 
-app.listen(port, () => console.log(`LegalPath API + web app running on port ${port}`));
+export { app };\n\n// Start the Express server only when running the Node server directly.\n// On Vercel, api/[...path].js imports the app as a serverless function.\nif (process.env.VERCEL !== "1") {\n  app.listen(port, "0.0.0.0", () => console.log(`LegalPath API + web app running on port ${port}`));\n}
