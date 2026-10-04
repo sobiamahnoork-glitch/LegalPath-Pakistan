@@ -185,7 +185,9 @@ app.post("/api/agents/assessment", async (req, res) => {
   }
 
   try {
-    const research = await researchAgent({ records: [] });
+    // Research Agent starts from approved database candidates instead of an empty list.
+    const researchCandidates = await loadResearchCandidates();
+    const research = await researchAgent({ records: researchCandidates });
     log("Research Agent", research.status, { count: research.count });
 
     const verification = await verificationAgent(research.records);
@@ -207,7 +209,9 @@ app.post("/api/agents/assessment", async (req, res) => {
       hypotheses: assessment.pathways.length
     });
 
-    const matching = matchingAgent(profile, []);
+    // Match only opportunities that passed the verification step.
+    const verified = verification.records.filter(r => r.verification_status === "verified" && r.is_active);
+    const matching = matchingAgent(profile, verified);
     log("Opportunity Matching Agent", matching.status, { count: matching.matches.length });
 
     // The fifth agent now runs as part of the assessment itself.
@@ -228,7 +232,8 @@ app.post("/api/agents/assessment", async (req, res) => {
           selected_pathway: selectedPathway,
           assessment: assessment.pathways,
           structured_roadmap: roadmap,
-          verified_opportunities: []
+          approved_sources: await getApprovedSourcesFromDb(),
+          verified_opportunities: matching.matches
         }
       });
       log("Career Coach Agent", coach.status, { pathway: roadmap.pathway, grounded: true });
