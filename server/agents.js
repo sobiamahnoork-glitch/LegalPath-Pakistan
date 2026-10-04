@@ -236,21 +236,27 @@ export function assessmentAgent(profile = {}, suppliedPathways = null) {
   };
 }
 
-export function matchingAgent(profile = {}, opportunities = []) {
+export function matchingAgent(profile = {}, opportunities = [], selectedPathway = "") {
   const text = profileText(profile);
   const userSkills = new Set([
     ...asArray(profile.skills).map(normalize),
     ...text.split(/[,;\n]+/).map(normalize)
   ].filter(Boolean));
 
+  const selected = normalize(selectedPathway);
   const matches = asArray(opportunities)
     .filter(o => o.verification_status === "verified" && o.is_active !== false)
+    .filter(o => {
+      if (!selected) return true;
+      const mappedPathways = asArray(o.pathways || o.pathway).map(normalize).filter(Boolean);
+      return mappedPathways.some(name => name === selected);
+    })
     .map(o => {
       const required = asArray(o.skills || o.required_skills);
       const matched = required.filter(skill => userSkills.has(normalize(skill)) || text.includes(normalize(skill)));
       const skillScore = required.length ? Math.round((matched.length / required.length) * 100) : 0;
       const pathwayText = asArray(o.pathways || o.pathway).join(" ").toLowerCase();
-      const interestScore = pathwayText && text ? (text.split(/[,;\n]+/).some(x => x && pathwayText.includes(x)) ? 20 : 0) : 0;
+      const interestScore = selected && pathwayText.includes(selected) ? 20 : 0;
 
       return {
         ...o,
@@ -259,7 +265,7 @@ export function matchingAgent(profile = {}, opportunities = []) {
         match_score: Math.min(100, skillScore + interestScore)
       };
     })
-    .filter(x => x.match_score > 0)
+    .filter(x => x.match_score > 0 || selected)
     .sort((a, b) => b.match_score - a.match_score);
 
   return {
