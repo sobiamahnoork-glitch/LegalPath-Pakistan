@@ -154,14 +154,14 @@ app.post("/api/agents/workflow", async (req, res) => {
       active: verification.active
     });
 
-    await loadPathways();
+    const loadedPathways = await loadPathways();
 
-    const intelligence = careerIntelligenceAgent(profile);
+    const intelligence = careerIntelligenceAgent(profile, loadedPathways);
     log(intelligence.agent, intelligence.status, {
       recommendations: intelligence.recommendations.length
     });
 
-    const assessment = assessmentAgent(profile);
+    const assessment = assessmentAgent(profile, loadedPathways);
     log("Assessment / Career Intelligence", assessment.status, {
       hypotheses: assessment.pathways.length
     });
@@ -248,14 +248,14 @@ app.post("/api/agents/assessment", async (req, res) => {
       active: verification.active
     });
 
-    await loadPathways();
+    const loadedPathways = await loadPathways();
 
-    const intelligence = careerIntelligenceAgent(profile);
+    const intelligence = careerIntelligenceAgent(profile, loadedPathways);
     log("Career Intelligence Agent", intelligence.status, {
       recommendations: intelligence.recommendations.length
     });
 
-    const assessment = assessmentAgent(profile);
+    const assessment = assessmentAgent(profile, loadedPathways);
     log("Career Intelligence Agent", assessment.status, {
       hypotheses: assessment.pathways.length
     });
