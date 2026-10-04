@@ -15,11 +15,13 @@ async function request(path) {
   let response;
   try {
     response = await fetch(url + "/rest/v1/" + path, {
-    headers: {
-      apikey: key,
-      Authorization: "Bearer " + key,
-      Accept: "application/json"
-    }, signal: controller.signal);
+      headers: {
+        apikey: key,
+        Authorization: "Bearer " + key,
+        Accept: "application/json"
+      },
+      signal: controller.signal
+    });
   } catch (error) {
     throw new Error(error.name === "AbortError" ? "Supabase request timed out" : error.message);
   } finally {

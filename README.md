@@ -1,11 +1,36 @@
-<div align="center">
+# LegalPath Pakistan
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+AI career operating system and career intelligence platform designed for Pakistani law students.
 
-  <h1>Built with AI Studio</h2>
+LegalPath Pakistan brings career pathways, skills development, verified legal opportunities, multi-agent workflows, and evidence-based career roadmaps into a unified workspace.
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+## Features
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
+- **Career Pathways**: Explore 5 key legal career tracks in Pakistan (Litigation & Advocacy, Judicial Service, Government Legal Service, Corporate / In-House Legal, Legal Research & Academia).
+- **Career Assessment & Discovery**: Evidence-based career exploration matching student profiles, skills, and extracurriculars to legal pathways.
+- **Opportunity Intelligence**: Source-first legal opportunities pipeline requiring verified provenance, deadlines, and eligibility before publication.
+- **AI Career Coach**: Grounded legal career coaching adhering strictly to verified Pakistani legal frameworks, bar requirements, and exam pathways.
+- **Multi-Agent Architecture**: Discrete agent pipeline (Research → Verification → Career Intelligence → Opportunity Matching → Career Coach).
 
-</div>
+## Quick Start
+
+```bash
+# Install dependencies
+npm install
+
+# Build & run
+npm run build
+npm run server
+```
+
+## API Endpoints
+
+- `GET /api/health` - Service health status
+- `GET /api/career-pathways` - Pakistani legal career pathways
+- `GET /api/skills` - Catalog of 25+ essential legal skills
+- `GET /api/opportunities` - Verified opportunities
+- `GET /api/agents/activity` - Multi-agent audit and activity log
+- `POST /api/agents/assessment` - Evidence-based pathway exploration
+- `POST /api/agents/roadmap` - 90-day actionable student roadmap
+- `POST /api/agents/coach` - Grounded AI career coach
+- `POST /api/agents/workflow` - End-to-end multi-agent execution pipeline

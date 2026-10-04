@@ -1,26 +1,26 @@
 {
   "name": "legalpath-pakistan",
   "private": true,
-  "version": "0.4.0",
+  "version": "0.3.0",
   "type": "module",
   "scripts": {
     "dev": "concurrently \"npm run server\" \"vite\"",
-    "server": "node server/index.js",
+    "server": "SERVER_PORT=8787 PORT=8787 node server/index.js",
     "dev:full": "npm run dev",
     "build": "vite build",
-    "prestart": "npm run build",
     "start": "node server/index.js",
     "preview": "vite preview"
   },
   "dependencies": {
-    "@vitejs/plugin-react": "latest",
-    "vite": "latest",
-    "react": "latest",
-    "react-dom": "latest",
-    "lucide-react": "latest",
-    "express": "latest",
-    "cors": "latest",
-    "dotenv": "latest",
-    "concurrently": "latest"
+    "@vitejs/plugin-react": "^6.1.1",
+    "concurrently": "^10.0.5",
+    "cors": "^2.8.5",
+    "dotenv": "^18.0.5",
+    "express": "^5.2.1",
+    "lucide-react": "^1.52.0",
+    "marked": "^18.0.14",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "vite": "^8.3.2"
   }
 }

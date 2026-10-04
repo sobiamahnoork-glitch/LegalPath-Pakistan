@@ -1,0 +1,8 @@
+{
+  "name": "LegalPath Pakistan",
+  "description": "AI career operating system for Pakistani law students.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

@@ -6,17 +6,16 @@ import express from "express";
 import cors from "cors";
 import { careerPathways, skills, opportunities } from "./data.js";
 import { getCareerPathwaysFromDb, getSkillsFromDb, getApprovedSourcesFromDb, getVerifiedOpportunitiesFromDb, getResearchCandidatesFromDb, supabaseConfigured } from "./supabase.js";
-import { researchAgent, verificationAgent, careerIntelligenceAgent, matchingAgent, fingerprint, assessmentAgent, roadmapAgent } from "./agents.js";
+import { researchAgent, verificationAgent, careerIntelligenceAgent, matchingAgent, fingerprint, assessmentAgent, roadmapAgent, filterRelevantSources } from "./agents.js";
 import { careerCoach } from "./ai.js";
 
 globalThis.__LEGALPATH_PATHWAYS__ = careerPathways;
 
-const app = express();
+export const app = express();
 app.use(cors());
 app.use(express.json({ limit: "1mb" }));
 
-const isLocalDevServer = process.env.npm_lifecycle_event === "server" || process.env.LEGALPATH_DEV === "1";
-const port = process.env.API_PORT || (isLocalDevServer ? 8787 : (process.env.PORT || 8787));
+const port = Number(process.env.SERVER_PORT || process.env.PORT || 8787);
 const runs = [];
 
 const log = (agent, status, meta = {}) => {
@@ -32,75 +31,28 @@ const log = (agent, status, meta = {}) => {
 };
 
 async function loadPathways() {
-  try {
-    const data = await getCareerPathwaysFromDb();
-    if (!Array.isArray(data) || data.length === 0) throw new Error("No active career pathways returned from database");
-    globalThis.__LEGALPATH_PATHWAYS__ = data;
-    return data;
-  } catch (error) {
-    console.error("[pathways] database read failed:", error.message);
-    globalThis.__LEGALPATH_PATHWAYS__ = careerPathways;
-    return careerPathways;
-  }
+  const data = await getCareerPathwaysFromDb();
+  globalThis.__LEGALPATH_PATHWAYS__ = data;
+  return data;
 }
 
 async function loadOpportunities() {
-  if (!supabaseConfigured) return opportunities;
-  try {
-    const data = await getVerifiedOpportunitiesFromDb();
-    return Array.isArray(data) && data.length ? data : opportunities;
-  } catch (error) {
-    console.error("[opportunities] database read failed:", error.message);
-    return opportunities;
-  }
+  return supabaseConfigured ? getVerifiedOpportunitiesFromDb() : opportunities;
 }
 
 async function loadResearchCandidates() {
-  if (!supabaseConfigured) return opportunities;
-  try {
-    const data = await getResearchCandidatesFromDb();
-    return Array.isArray(data) && data.length ? data : opportunities;
-  } catch (error) {
-    console.error("[research] database read failed:", error.message);
-    return opportunities;
-  }
+  return supabaseConfigured ? getResearchCandidatesFromDb() : opportunities;
 }
 
-async function loadApprovedSources() {
-  if (!supabaseConfigured) return [];
-  try {
-    const data = await getApprovedSourcesFromDb();
-    return Array.isArray(data) ? data : [];
-  } catch (error) {
-    console.error("[sources] database read failed:", error.message);
-    return [];
-  }
-}
-
-app.get("/api/health", async (req, res) => {
-  const health = {
+app.get("/api/health", (req, res) =>
+  res.json({
     ok: true,
     service: "LegalPath Pakistan API",
     database: supabaseConfigured ? "configured" : "not configured",
     ai: !!process.env.GEMINI_API_KEY,
-    version: "0.6.0"
-  };
-
-  if (supabaseConfigured) {
-    try {
-      await getApprovedSourcesFromDb();
-      health.database_reachable = true;
-    } catch (error) {
-      health.ok = false;
-      health.database_reachable = false;
-      health.database_error = error.message;
-    }
-  } else {
-    health.database_reachable = false;
-  }
-
-  res.status(health.ok ? 200 : 503).json(health);
-});
+    version: "0.5.0"
+  })
+);
 
 app.get("/api/career-pathways", async (req, res) => {
   try {
@@ -169,11 +121,11 @@ app.post("/api/agents/workflow", async (req, res) => {
 
     const verified = verification.records.filter(r => r.verification_status === "verified" && r.is_active);
     const matching = matchingAgent(profile, verified);
-    const approvedSources = await loadApprovedSources();
+    const approvedSources = await getApprovedSourcesFromDb();
     log(matching.agent, matching.status, { count: matching.matches.length });
 
     const selectedPathway = req.body.pathway || assessment.pathways[0]?.pathway || "";
-    const roadmap = roadmapAgent(profile, selectedPathway, loadedPathways);
+    const roadmap = roadmapAgent(profile, selectedPathway);
     log(roadmap.agent, roadmap.status, { pathway: roadmap.pathway });
 
     let coach;
@@ -209,15 +161,12 @@ app.post("/api/agents/workflow", async (req, res) => {
       coach
     });
   } catch (e) {
-    console.error("[workflow] failed:", e);
-    res.status(503).json({
-      error: e.message || "Workflow service failed",
-      code: "WORKFLOW_BACKEND_ERROR"
-    });
+    res.status(400).json({ error: e.message });
   }
 });
 
 app.post("/api/agents/assessment", async (req, res) => {
+  let currentStage = "validation";
   const profile = req.body.profile || {};
   const requiredFields = {
     year: "Current year / stage",
@@ -232,16 +181,18 @@ app.post("/api/agents/assessment", async (req, res) => {
     .map(([, label]) => label);
   if (missingFields.length) {
     return res.status(400).json({
-      error: "Please complete the required profile fields before running the assessment: " + missingFields.join(", ") + "."
+      error: "Please complete the required profile fields before running the assessment: " + missingFields.join(", ") + ".",
+      stage: currentStage
     });
   }
 
   try {
-    // Research Agent starts from approved database candidates instead of an empty list.
+    currentStage = "research_agent";
     const researchCandidates = await loadResearchCandidates();
     const research = await researchAgent({ records: researchCandidates });
     log("Research Agent", research.status, { count: research.count });
 
+    currentStage = "verification_agent";
     const verification = await verificationAgent(research.records);
     log("Verification Agent", verification.status, {
       verified: verification.verified,
@@ -249,104 +200,78 @@ app.post("/api/agents/assessment", async (req, res) => {
       active: verification.active
     });
 
+    currentStage = "career_intelligence_agent";
     const loadedPathways = await loadPathways();
-
     const intelligence = careerIntelligenceAgent(profile, loadedPathways);
     log("Career Intelligence Agent", intelligence.status, {
       recommendations: intelligence.recommendations.length
     });
 
+    currentStage = "assessment_agent";
     const assessment = assessmentAgent(profile, loadedPathways);
     log("Career Intelligence Agent", assessment.status, {
       hypotheses: assessment.pathways.length
     });
 
-    // Match only opportunities that passed the verification step.
-    const verified = verification.records.filter(r => r.verification_status === "verified" && r.is_active);
-    const matching = matchingAgent(profile, verified);
-    const approvedSources = await getApprovedSourcesFromDb();
-    log("Opportunity Matching Agent", matching.status, { count: matching.matches.length });
-
-    // The fifth agent now runs as part of the assessment itself.
-    // It uses the strongest exploration hypothesis as the initial experiment,
-    // while the UI can still rebuild the experiment when another pathway is selected.
-    const selectedPathway = assessment.pathways[0]?.pathway || "";
-    const roadmap = roadmapAgent(profile, selectedPathway, loadedPathways);
-
-    // Keep the structured roadmap as the deterministic layer and add
-    // grounded Gemini coaching from the same supplied career context.
-    let coach;
-    try {
-      coach = await careerCoach({
-        profile,
-        question: "Turn the strongest pathway signal into concise, practical career guidance for the next 90 days.",
-        context: {
-          career_pathways: globalThis.__LEGALPATH_PATHWAYS__ || [],
-          selected_pathway: selectedPathway,
-          assessment: assessment.pathways,
-          structured_roadmap: roadmap,
-          approved_sources: approvedSources,
-          verified_opportunities: matching.matches
-        }
-      });
-      log("Career Coach Agent", coach.status, { pathway: roadmap.pathway, grounded: true });
-    } catch (coachError) {
-      coach = {
-        agent: "Career Coach Agent",
-        status: "fallback",
-        error: coachError.message,
-        grounded: false,
-        answer: "The structured 90-day experiment is ready. AI narrative coaching will appear when the Gemini service is configured."
-      };
-      log("Career Coach Agent", coach.status, { pathway: roadmap.pathway, grounded: false });
-    }
-
     res.json({
-      ...assessment,
+      pathways: assessment.pathways,
+      mode: assessment.mode,
+      note: assessment.note,
       workflow: {
         agents_run: [
           "Research Agent",
           "Verification Agent",
-          "Career Intelligence Agent",
-          "Opportunity Matching Agent",
-          "Career Coach Agent"
+          "Career Intelligence Agent"
         ],
-        agents_pending: [],
-        note: "The Career Coach Agent combines a structured pathway experiment with grounded AI coaching. Selecting another pathway rebuilds the experiment for that pathway."
+        agents_pending: [
+          "Opportunity Matching Agent",
+          "Legal Career Coach Agent"
+        ],
+        note: "Pathway exploration signals ready. Select any pathway and click 'Build 90-day experiment' to generate your personalized action plan."
       },
-      intelligence: intelligence.recommendations,
-      roadmap,
-      coach
+      intelligence: intelligence.recommendations
     });
   } catch (e) {
-    console.error("[assessment] failed:", e);
-    res.status(503).json({
-      error: e.message || "Assessment service failed",
-      code: "ASSESSMENT_BACKEND_ERROR"
+    res.status(400).json({
+      error: e.message,
+      stage: currentStage,
+      details: e.stack
     });
   }
 });
 
 app.post("/api/agents/roadmap", async (req, res) => {
+  let currentStage = "roadmap_agent";
   try {
-    await loadPathways();
+    const loadedPathways = await loadPathways();
     const profile = req.body.profile || {};
     const pathway = req.body.pathway || "";
-    const out = roadmapAgent(profile, pathway, globalThis.__LEGALPATH_PATHWAYS__ || []);
+    if (!pathway) {
+      return res.status(400).json({ error: "Pathway is required to build a 90-day experiment.", stage: "validation" });
+    }
+    const out = roadmapAgent(profile, pathway);
     const verifiedOpportunities = await loadOpportunities();
-    const approvedSources = await getApprovedSourcesFromDb();
+    const allApprovedSources = await getApprovedSourcesFromDb();
+    const pathwayDetails = loadedPathways.find(p => p.name === out.pathway || p.id === out.pathway) || {};
 
+    // Filter verified opportunities and approved sources strictly for this pathway
+    currentStage = "opportunity_matching_agent";
+    const matching = matchingAgent(profile, verifiedOpportunities, out.pathway);
+    const relevantSources = filterRelevantSources(allApprovedSources, out.pathway, pathwayDetails);
+
+    currentStage = "career_coach_grounding";
     let coach;
     try {
       coach = await careerCoach({
         profile,
-        question: "Turn this selected legal career pathway and its 90-day experiment into concise, practical guidance. Stay grounded in the supplied context.",
+        question: `Turn this selected legal career pathway (${out.pathway}) into concise, practical guidance. Stay grounded in the supplied context.`,
         context: {
-          career_pathways: globalThis.__LEGALPATH_PATHWAYS__ || [],
+          career_pathways: loadedPathways,
           selected_pathway: out.pathway,
+          pathway_details: pathwayDetails,
           structured_roadmap: out,
-          approved_sources: approvedSources,
-          verified_opportunities: verifiedOpportunities
+          approved_sources: relevantSources,
+          verified_opportunities: matching.matches
         }
       });
       log("Career Coach Agent", coach.status, { pathway: out.pathway, grounded: true });
@@ -358,16 +283,38 @@ app.post("/api/agents/roadmap", async (req, res) => {
         grounded: false,
         answer: "The structured 90-day experiment is ready. AI narrative coaching will appear when the Gemini service is configured."
       };
-      log("Career Coach Agent", coach.status, { pathway: out.pathway, grounded: false });
+      log("Career Coach Agent", coach.status, { pathway: out.pathway, grounded: false, error: coachError.message });
     }
 
     log(out.agent, out.status, {
       pathway: out.pathway,
       coach: coach.status
     });
-    res.json({ ...out, coach });
+    res.json({
+      ...out,
+      pathway_details: pathwayDetails,
+      matching: matching.matches,
+      matching_note: matching.note,
+      sources: relevantSources,
+      coach,
+      workflow: {
+        agents_run: [
+          "Research Agent",
+          "Verification Agent",
+          "Career Intelligence Agent",
+          "Opportunity Matching Agent",
+          "Legal Career Coach Agent"
+        ],
+        agents_pending: [],
+        note: `90-day experiment and grounded coaching prepared for ${out.pathway}.`
+      }
+    });
   } catch (e) {
-    res.status(400).json({ error: e.message });
+    res.status(400).json({
+      error: e.message,
+      stage: currentStage,
+      details: e.stack
+    });
   }
 });
 
@@ -398,8 +345,7 @@ app.post("/api/agents/verify", async (req, res) => {
 app.post("/api/agents/career-intelligence", async (req, res) => {
   try {
     await loadPathways();
-    const loadedPathways = await loadPathways();
-    const out = careerIntelligenceAgent(req.body.profile || {}, loadedPathways);
+    const out = careerIntelligenceAgent(req.body.profile || {});
     log(out.agent, out.status);
     res.json(out);
   } catch (e) {
@@ -472,11 +418,4 @@ app.use((req, res) => {
   res.status(404).json({ error: "Route not found" });
 });
 
-export { app };
-
-// Vercel imports the Express app as a serverless handler.
-// Local/Deplexo deployments start the HTTP listener below.
-// On Vercel, api/[...path].js imports the app as a serverless function.
-if (process.env.VERCEL !== "1") {
-  app.listen(port, "0.0.0.0", () => console.log(`LegalPath API + web app running on port ${port}`));
-}
+app.listen(port, "0.0.0.0", () => console.log(`LegalPath API + web app running on port ${port}`));
