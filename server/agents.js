@@ -195,8 +195,8 @@ function scorePathway(pathway, profile) {
   };
 }
 
-export function careerIntelligenceAgent(profile = {}) {
-  const pathways = asArray(globalThis.__LEGALPATH_PATHWAYS__);
+export function careerIntelligenceAgent(profile = {}, suppliedPathways = null) {
+  const pathways = asArray(suppliedPathways ?? globalThis.__LEGALPATH_PATHWAYS__);
   const recommendations = pathways
     .map(pathway => scorePathway(pathway, profile))
     .sort((a, b) => b.match_score - a.match_score);
@@ -211,8 +211,8 @@ export function careerIntelligenceAgent(profile = {}) {
   };
 }
 
-export function assessmentAgent(profile = {}) {
-  const pathways = asArray(globalThis.__LEGALPATH_PATHWAYS__);
+export function assessmentAgent(profile = {}, suppliedPathways = null) {
+  const pathways = asArray(suppliedPathways ?? globalThis.__LEGALPATH_PATHWAYS__);
   const ranked = pathways
     .map(pathway => scorePathway(pathway, profile))
     .sort((a, b) => b.match_score - a.match_score);
