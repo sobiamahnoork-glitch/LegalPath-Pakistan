@@ -121,6 +121,7 @@ app.post("/api/agents/workflow", async (req, res) => {
 
     const verified = verification.records.filter(r => r.verification_status === "verified" && r.is_active);
     const matching = matchingAgent(profile, verified);
+    const approvedSources = await getApprovedSourcesFromDb();
     log(matching.agent, matching.status, { count: matching.matches.length });
 
     const selectedPathway = req.body.pathway || assessment.pathways[0]?.pathway || "";
@@ -231,7 +232,7 @@ app.post("/api/agents/assessment", async (req, res) => {
           selected_pathway: selectedPathway,
           assessment: assessment.pathways,
           structured_roadmap: roadmap,
-          approved_sources: await getApprovedSourcesFromDb(),
+          approved_sources: approvedSources,
           verified_opportunities: matching.matches
         }
       });
@@ -275,6 +276,8 @@ app.post("/api/agents/roadmap", async (req, res) => {
     const profile = req.body.profile || {};
     const pathway = req.body.pathway || "";
     const out = roadmapAgent(profile, pathway);
+    const verifiedOpportunities = await loadOpportunities();
+    const approvedSources = await getApprovedSourcesFromDb();
 
     let coach;
     try {
@@ -285,7 +288,8 @@ app.post("/api/agents/roadmap", async (req, res) => {
           career_pathways: globalThis.__LEGALPATH_PATHWAYS__ || [],
           selected_pathway: out.pathway,
           structured_roadmap: out,
-          verified_opportunities: []
+          approved_sources: approvedSources,
+          verified_opportunities: verifiedOpportunities
         }
       });
       log("Career Coach Agent", coach.status, { pathway: out.pathway, grounded: true });
