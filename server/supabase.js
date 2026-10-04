@@ -10,13 +10,21 @@ async function request(path) {
     throw new Error("SUPABASE_URL and SUPABASE_ANON_KEY are not configured");
   }
 
-  const response = await fetch(url + "/rest/v1/" + path, {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 7000);
+  let response;
+  try {
+    response = await fetch(url + "/rest/v1/" + path, {
     headers: {
       apikey: key,
       Authorization: "Bearer " + key,
       Accept: "application/json"
-    }
-  });
+    }, signal: controller.signal);
+  } catch (error) {
+    throw new Error(error.name === "AbortError" ? "Supabase request timed out" : error.message);
+  } finally {
+    clearTimeout(timeout);
+  }
 
   if (!response.ok) {
     const body = await response.text();
