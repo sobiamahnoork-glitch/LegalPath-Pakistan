@@ -31,17 +31,49 @@ const log = (agent, status, meta = {}) => {
 };
 
 async function loadPathways() {
-  const data = await getCareerPathwaysFromDb();
-  globalThis.__LEGALPATH_PATHWAYS__ = data;
-  return data;
+  try {
+    const data = await getCareerPathwaysFromDb();
+    if (!Array.isArray(data) || data.length === 0) throw new Error("No active career pathways returned from database");
+    globalThis.__LEGALPATH_PATHWAYS__ = data;
+    return data;
+  } catch (error) {
+    console.error("[pathways] database read failed:", error.message);
+    globalThis.__LEGALPATH_PATHWAYS__ = careerPathways;
+    return careerPathways;
+  }
 }
 
 async function loadOpportunities() {
-  return supabaseConfigured ? getVerifiedOpportunitiesFromDb() : opportunities;
+  if (!supabaseConfigured) return opportunities;
+  try {
+    const data = await getVerifiedOpportunitiesFromDb();
+    return Array.isArray(data) && data.length ? data : opportunities;
+  } catch (error) {
+    console.error("[opportunities] database read failed:", error.message);
+    return opportunities;
+  }
 }
 
 async function loadResearchCandidates() {
-  return supabaseConfigured ? getResearchCandidatesFromDb() : opportunities;
+  if (!supabaseConfigured) return opportunities;
+  try {
+    const data = await getResearchCandidatesFromDb();
+    return Array.isArray(data) && data.length ? data : opportunities;
+  } catch (error) {
+    console.error("[research] database read failed:", error.message);
+    return opportunities;
+  }
+}
+
+async function loadApprovedSources() {
+  if (!supabaseConfigured) return [];
+  try {
+    const data = await getApprovedSourcesFromDb();
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    console.error("[sources] database read failed:", error.message);
+    return [];
+  }
 }
 
 app.get("/api/health", async (req, res) => {
@@ -136,7 +168,7 @@ app.post("/api/agents/workflow", async (req, res) => {
 
     const verified = verification.records.filter(r => r.verification_status === "verified" && r.is_active);
     const matching = matchingAgent(profile, verified);
-    const approvedSources = await getApprovedSourcesFromDb();
+    const approvedSources = await loadApprovedSources();
     log(matching.agent, matching.status, { count: matching.matches.length });
 
     const selectedPathway = req.body.pathway || assessment.pathways[0]?.pathway || "";
