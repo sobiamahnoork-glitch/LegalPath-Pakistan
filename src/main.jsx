@@ -16,30 +16,30 @@ function safeExternalUrl(value){
 }
 
 function renderInlineMarkdown(text,keyPrefix="md"){
- const parts=String(text||"").split(/(\\*\\*[^*]+\\*\\*|\\[[^\\]]+\\]\\(https?:\\/\\/[^)]+\\))/g);
+ const parts=String(text||"").split(/(\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^)]+\))/g);
  return parts.map((part,i)=>{
-  const bold=part.match(/^\\*\\*([^*]+)\\*\\*$/);
+  const bold=part.match(/^\*\*([^*]+)\*\*$/);
   if(bold)return <strong key={keyPrefix+"b"+i}>{bold[1]}</strong>;
-  const linkMatch=part.match(/^\\[([^\\]]+)\\]\\((https?:\\/\\/[^)]+)\\)$/);
+  const linkMatch=part.match(/^\[([^\]]+)\]\((https?:\/\/[^)]+)\)$/);
   if(linkMatch)return <a key={keyPrefix+"l"+i} href={safeExternalUrl(linkMatch[2])||"#"} target="_blank" rel="noreferrer noopener">{linkMatch[1]}</a>;
   return <React.Fragment key={keyPrefix+"t"+i}>{part}</React.Fragment>;
  });
 }
 
 function MarkdownContent({text}){
- const lines=String(text||"").replace(/\\r\\n/g,"\\n").split("\\n");
+ const lines=String(text||"").replace(/\r\n/g,"\n").split("\n");
  const blocks=[];
  let list=[];
  const flushList=()=>{if(list.length){blocks.push(<ul key={"ul"+blocks.length}>{list.map((item,i)=><li key={i}>{renderInlineMarkdown(item,"li"+i)}</li>)}</ul>);list=[]}};
  lines.forEach((raw,i)=>{
   const line=raw.trim();
   if(!line){flushList();return}
-  const heading=line.match(/^#{1,3}\\s+(.+)$/);
-  const bullet=line.match(/^[-*]\\s+(.+)$/);
-  const numbered=line.match(/^\\d+[.)]\\s+(.+)$/);
+  const heading=line.match(/^#{1,3}\s+(.+)$/);
+  const bullet=line.match(/^[-*]\s+(.+)$/);
+  const numbered=line.match(/^\d+[.)]\s+(.+)$/);
   if(heading){flushList();const level=heading[0].match(/^#+/)[0].length;const Tag=level===1?"h3":level===2?"h4":"h5";blocks.push(<Tag key={"h"+i}>{renderInlineMarkdown(heading[1],"h"+i)}</Tag>);return}
   if(bullet){list.push(bullet[1]);return}
-  if(numbered){flushList();blocks.push(<p key={"n"+i}><b>{line.match(/^\\d+[.)]/)[0]}</b> {renderInlineMarkdown(numbered[1],"n"+i)}</p>);return}
+  if(numbered){flushList();blocks.push(<p key={"n"+i}><b>{line.match(/^\d+[.)]/)[0]}</b> {renderInlineMarkdown(numbered[1],"n"+i)}</p>);return}
   flushList();
   blocks.push(<p key={"p"+i}>{renderInlineMarkdown(line,"p"+i)}</p>);
  });
