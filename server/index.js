@@ -271,7 +271,7 @@ app.post("/api/agents/assessment", async (req, res) => {
     // It uses the strongest exploration hypothesis as the initial experiment,
     // while the UI can still rebuild the experiment when another pathway is selected.
     const selectedPathway = assessment.pathways[0]?.pathway || "";
-    const roadmap = roadmapAgent(profile, selectedPathway);
+    const roadmap = roadmapAgent(profile, selectedPathway, loadedPathways);
 
     // Keep the structured roadmap as the deterministic layer and add
     // grounded Gemini coaching from the same supplied career context.
