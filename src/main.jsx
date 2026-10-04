@@ -15,39 +15,6 @@ function safeExternalUrl(value){
  }catch{return ""}
 }
 
-function renderInlineMarkdown(text,keyPrefix="md"){
- const parts=String(text||"").split(/(\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^)]+\))/g);
- return parts.map((part,i)=>{
-  const bold=part.match(/^\*\*([^*]+)\*\*$/);
-  if(bold)return <strong key={keyPrefix+"b"+i}>{bold[1]}</strong>;
-  const linkMatch=part.match(/^\[([^\]]+)\]\((https?:\/\/[^)]+)\)$/);
-  if(linkMatch)return <a key={keyPrefix+"l"+i} href={safeExternalUrl(linkMatch[2])||"#"} target="_blank" rel="noreferrer noopener">{linkMatch[1]}</a>;
-  return <React.Fragment key={keyPrefix+"t"+i}>{part}</React.Fragment>;
- });
-}
-
-function MarkdownContent({text}){
- const normalizedText=String(text||"").replace(/\\([#*_-])/g,"$1");
- const lines=normalizedText.replace(/\r\n/g,"\n").split("\n");
- const blocks=[];
- let list=[];
- const flushList=()=>{if(list.length){blocks.push(<ul key={"ul"+blocks.length}>{list.map((item,i)=><li key={i}>{renderInlineMarkdown(item,"li"+i)}</li>)}</ul>);list=[]}};
- lines.forEach((raw,i)=>{
-  const line=raw.trim();
-  if(!line){flushList();return}
-  const heading=line.match(/^#{1,3}\s+(.+)$/);
-  const bullet=line.match(/^[-*]\s+(.+)$/);
-  const numbered=line.match(/^\d+[.)]\s+(.+)$/);
-  if(heading){flushList();const level=heading[0].match(/^#+/)[0].length;const Tag=level===1?"h3":level===2?"h4":"h5";blocks.push(<Tag key={"h"+i}>{renderInlineMarkdown(heading[1],"h"+i)}</Tag>);return}
-  if(bullet){list.push(bullet[1]);return}
-  if(numbered){flushList();blocks.push(<p key={"n"+i}><b>{line.match(/^\d+[.)]/)[0]}</b> {renderInlineMarkdown(numbered[1],"n"+i)}</p>);return}
-  flushList();
-  blocks.push(<p key={"p"+i}>{renderInlineMarkdown(line,"p"+i)}</p>);
- });
- flushList();
- return <div className="markdownContent">{blocks}</div>;
-}
-
 function App(){
  const[page,setPage]=useState("Career Assessment"),[open,setOpen]=useState(false),[selectedPath,setSelectedPath]=useState(null);
  const go=p=>{setPage(p);setOpen(false);window.scrollTo({top:0,behavior:"smooth"})};
@@ -77,7 +44,7 @@ function Assessment({go}){
  const roadmapRef=useRef(null);
  useEffect(()=>{if(!roadmap)return;const t=setTimeout(()=>roadmapRef.current?.scrollIntoView({behavior:"smooth",block:"start"}),120);return()=>clearTimeout(t)},[roadmap]);
  const set=(k,v)=>setProfile(p=>({...p,[k]:v}));
- const submit=async()=>{setError("");setRoadmap(null);setResult(null);const required=[["year","Current year / stage"],["interests","Legal interests"],["skills","Current skills"],["activities","Activities / experience"],["environment","Preferred working environment"],["geography","Geographic preference"]];const missing=required.filter(([k])=>!String(profile[k]||"").trim());if(missing.length){setError("Please complete the required profile fields before running the assessment: "+missing.map(x=>x[1]).join(", ")+".");return}setBusy(true);try{const r=await api("/agents/assessment",{method:"POST",body:JSON.stringify({profile})});const normalized={...r,pathways:Array.isArray(r.pathways)?r.pathways:(Array.isArray(r.assessment?.pathways)?r.assessment.pathways:[])};setResult(normalized);if(!normalized.pathways.length){setError("Assessment completed, but no pathway hypotheses were returned. Please try the assessment again.");return}}catch(e){setError(e.message)}finally{setBusy(false)}};
+ const submit=async()=>{setError("");setRoadmap(null);setResult(null);const required=[["year","Current year / stage"],["interests","Legal interests"],["skills","Current skills"],["activities","Activities / experience"],["environment","Preferred working environment"],["geography","Geographic preference"]];const missing=required.filter(([k])=>!String(profile[k]||"").trim());if(missing.length){setError("Please complete the required profile fields before running the assessment: "+missing.map(x=>x[1]).join(", ")+".");return}setBusy(true);try{const r=await api("/agents/assessment",{method:"POST",body:JSON.stringify({profile})});const normalized={...r,pathways:Array.isArray(r.pathways)?r.pathways:(Array.isArray(r.assessment?.pathways)?r.assessment.pathways:[])};setResult(normalized);if(!normalized.pathways.length){setError("Assessment completed, but no pathway hypotheses were returned. Please try the assessment again.");return}if(normalized.roadmap){setRoadmap(normalized.roadmap)}else{const firstPathway=normalized.pathways[0]?.pathway;if(firstPathway){try{const coach=await api("/agents/roadmap",{method:"POST",body:JSON.stringify({profile,pathway:firstPathway})});setRoadmap(coach)}catch(coachError){setError("Assessment completed, but the Career Coach could not prepare the first experiment yet: "+coachError.message)}}}}catch(e){setError(e.message)}finally{setBusy(false)}};
  const build=async(pathway)=>{setBusy(true);setBuildingPath(pathway);setError("");setRoadmap(null);try{const r=await api("/agents/roadmap",{method:"POST",body:JSON.stringify({profile,pathway})});setRoadmap(r)}catch(e){setError(e.message)}finally{setBusy(false);setBuildingPath("")}};
  const pipeline=[["01","Research Agent","Source discovery","Reads approved opportunity records when available"],["02","Verification Agent","Trust layer","Checks source, deadline and record validity"],["03","Career Intelligence Agent","Career mapping","Maps your evidence to pathways and skill gaps"],["04","Opportunity Matching Agent","Personalisation","Matches your profile against verified opportunities"],["05","Legal Career Coach Agent","Action planning","Builds a grounded 90-day experiment for your selected pathway"]];
  const agentProgress=result?roadmap?"All 5 agents completed — Career Coach result ready.":"Agents 01–04 completed — Legal Career Coach is preparing your result…":"Five agents will run in sequence when you start the assessment.";
@@ -115,7 +82,7 @@ function Assessment({go}){
       </div><ChevronRight size={18}/>
     </button>)}
     {result?.pathways?.length>0&&!roadmap&&!buildingPath&&<div className="resultScrollCue"><Clock3 size={14}/> Your strongest pathway experiment is ready to build below. You can also choose any other pathway above.</div>}{buildingPath&&<div className="resultScrollCue"><Clock3 size={14}/> Career Coach is building a new 90-day experiment for {buildingPath}…</div>}{!result&&<div className="resultEmpty"><Target size={24}/><b>Your results will appear here</b><span>You'll get pathway signals, matched skills, skill gaps and a next-step experiment.</span></div>}
-    {roadmap&&<div ref={roadmapRef} className="roadmapBox"><div className="roadmapHead"><div><span className="eyebrow">STEP 03 · PREPARE</span><h4><Sparkles size={15}/> Legal Career Coach Agent</h4><p>90-day experiment · {roadmap.pathway}</p><span className="coachLive"><CheckCircle2 size={12}/> Agent completed</span></div><span>{roadmap.stage}</span></div><div className="coachRole"><ShieldCheck size={14}/><span>Role: turn the selected pathway into a practical, evidence-building career experiment.</span></div><div className="experimentGoal"><small>EXPERIMENT GOAL</small><b>{roadmap.experiment_goal||"Build evidence for the selected pathway through a focused practical project."}</b></div>{roadmap.priority_skills?.length>0&&<p><b>Priority skills</b><br/>{roadmap.priority_skills.join(" · ")}</p>}<div className="roadSteps">{roadmap.next_90_days.map((x,i)=><div className="roadStep" key={x}><span>{String(i+1).padStart(2,"0")}</span><div><small>90-DAY ACTION</small>{x}</div></div>)}</div>{roadmap.success_indicators?.length>0&&<div className="successBox"><small>SUCCESS INDICATORS</small>{roadmap.success_indicators.map(x=><span key={x}><CheckCircle2 size={12}/>{x}</span>)}</div>}{roadmap.coach?.answer&&<div className="aiCoachBox"><small>AI COACH INSIGHT · {roadmap.pathway}</small><MarkdownContent text={roadmap.coach.answer}/></div>}{!roadmap.coach?.answer&&result?.coach?.answer&&result?.pathways?.[0]?.pathway===roadmap.pathway&&<div className="aiCoachBox"><small>AI COACH INSIGHT · {roadmap.pathway}</small><MarkdownContent text={result.coach.answer}/></div>}{roadmap.opportunities?.length>0?<div className="opportunitySection"><small>RELEVANT VERIFIED OPPORTUNITIES</small><div className="opportunityGrid">{roadmap.opportunities.map((o,i)=><article className="opportunityCard" key={o.id||o.title||i}><div><b>{o.title}</b><span>{o.organisation||o.organization||"Verified opportunity"}{o.opportunity_type||o.type?` · ${o.opportunity_type||o.type}`:""}</span>{o.deadline&&<small>Deadline: {new Date(o.deadline).toLocaleString()}</small>}</div>{safeExternalUrl(o.source_url||o.application_url||o.url)&&<a className="outlineBtn" href={safeExternalUrl(o.source_url||o.application_url||o.url)} target="_blank" rel="noreferrer noopener">View official opportunity <ExternalLink size={14}/></a>}</article>)}</div></div>:<div className="opportunitySection"><small>RELEVANT VERIFIED OPPORTUNITIES</small><p>No directly matched verified opportunities are currently available for this pathway.</p></div>}{roadmap.sources?.length>0&&<div className="sourceSection"><small>RELEVANT APPROVED SOURCES</small>{roadmap.sources.map((s,i)=><a className="sourceRow" key={s.id||s.name||i} href={safeExternalUrl(s.url)||"#"} target="_blank" rel="noreferrer noopener"><ShieldCheck size={15}/><div><b>{s.name}</b><span>{s.url}</span></div><ExternalLink size={14}/></a>)}</div>}</div>}
+    {roadmap&&<div ref={roadmapRef} className="roadmapBox"><div className="roadmapHead"><div><span className="eyebrow">STEP 03 · PREPARE</span><h4><Sparkles size={15}/> Legal Career Coach Agent</h4><p>90-day experiment · {roadmap.pathway}</p><span className="coachLive"><CheckCircle2 size={12}/> Agent completed</span></div><span>{roadmap.stage}</span></div><div className="coachRole"><ShieldCheck size={14}/><span>Role: turn the selected pathway into a practical, evidence-building career experiment.</span></div><div className="experimentGoal"><small>EXPERIMENT GOAL</small><b>{roadmap.experiment_goal||"Build evidence for the selected pathway through a focused practical project."}</b></div>{roadmap.priority_skills?.length>0&&<p><b>Priority skills</b><br/>{roadmap.priority_skills.join(" · ")}</p>}<div className="roadSteps">{roadmap.next_90_days.map((x,i)=><div className="roadStep" key={x}><span>{String(i+1).padStart(2,"0")}</span><div><small>90-DAY ACTION</small>{x}</div></div>)}</div>{roadmap.success_indicators?.length>0&&<div className="successBox"><small>SUCCESS INDICATORS</small>{roadmap.success_indicators.map(x=><span key={x}><CheckCircle2 size={12}/>{x}</span>)}</div>}{roadmap.coach?.answer&&<div className="aiCoachBox"><small>AI COACH INSIGHT · {roadmap.pathway}</small><p>{roadmap.coach.answer}</p></div>}{!roadmap.coach?.answer&&result?.coach?.answer&&result?.pathways?.[0]?.pathway===roadmap.pathway&&<div className="aiCoachBox"><small>AI COACH INSIGHT · {roadmap.pathway}</small><p>{result.coach.answer}</p></div>}</div>}
    </div>
   </div>
  </section>
