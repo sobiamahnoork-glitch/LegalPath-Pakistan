@@ -27,7 +27,8 @@ function renderInlineMarkdown(text,keyPrefix="md"){
 }
 
 function MarkdownContent({text}){
- const lines=String(text||"").replace(/\r\n/g,"\n").split("\n");
+ const normalizedText=String(text||"").replace(/\\([#*_-])/g,"$1");
+ const lines=normalizedText.replace(/\r\n/g,"\n").split("\n");
  const blocks=[];
  let list=[];
  const flushList=()=>{if(list.length){blocks.push(<ul key={"ul"+blocks.length}>{list.map((item,i)=><li key={i}>{renderInlineMarkdown(item,"li"+i)}</li>)}</ul>);list=[]}};
