@@ -156,6 +156,7 @@ app.post("/api/agents/workflow", async (req, res) => {
     });
 
     const loadedPathways = await loadPathways();
+    if (!Array.isArray(loadedPathways) || loadedPathways.length === 0) throw new Error("No career pathways loaded");
 
     const intelligence = careerIntelligenceAgent(profile, loadedPathways);
     log(intelligence.agent, intelligence.status, {
@@ -301,8 +302,13 @@ app.post("/api/agents/assessment", async (req, res) => {
       log("Career Coach Agent", coach.status, { pathway: roadmap.pathway, grounded: false });
     }
 
+    const pathwayHypotheses = Array.isArray(assessment.pathways) ? assessment.pathways : [];
+    if (!pathwayHypotheses.length) throw new Error("Assessment produced no pathway hypotheses");
+
     res.json({
       ...assessment,
+      pathways: pathwayHypotheses,
+      pathway_count: pathwayHypotheses.length,
       workflow: {
         agents_run: [
           "Research Agent",
