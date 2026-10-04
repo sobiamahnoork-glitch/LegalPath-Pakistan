@@ -15,7 +15,8 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: "1mb" }));
 
-const port = process.env.PORT || 8787;
+const isLocalDevServer = process.env.npm_lifecycle_event === "server" || process.env.LEGALPATH_DEV === "1";
+const port = process.env.API_PORT || (isLocalDevServer ? 8787 : (process.env.PORT || 8787));
 const runs = [];
 
 const log = (agent, status, meta = {}) => {
@@ -331,7 +332,7 @@ app.post("/api/agents/roadmap", async (req, res) => {
     await loadPathways();
     const profile = req.body.profile || {};
     const pathway = req.body.pathway || "";
-    const out = roadmapAgent(profile, pathway);
+    const out = roadmapAgent(profile, pathway, globalThis.__LEGALPATH_PATHWAYS__ || []);
     const verifiedOpportunities = await loadOpportunities();
     const approvedSources = await getApprovedSourcesFromDb();
 
