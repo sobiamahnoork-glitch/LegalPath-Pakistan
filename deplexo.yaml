@@ -1,0 +1,5 @@
+framework: node
+install: npm install
+build: npm run build
+start: npm start
+port: 8787
