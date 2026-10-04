@@ -90,9 +90,14 @@ function scorePathway(pathway, profile) {
   const text = profileText(profile);
   const pathwaySkills = asArray(pathway.skills);
   const skillDetails = asArray(pathway.skill_details);
+  const explicitSkills = asArray(profile.skills)
+    .map(normalize)
+    .filter(Boolean);
+  const studentSkillEvidence = asArray(profile.student_skills);
   const evidence = [];
 
   let score = 0;
+  let maxScore = 0;
   const matchedSkills = [];
   const missingSkills = [];
 
@@ -100,12 +105,29 @@ function scorePathway(pathway, profile) {
     const skillName = clean(skill);
     if (!skillName) continue;
 
-    if (text.includes(normalize(skillName))) {
-      const detail = skillDetails.find(x => normalize(x.name) === normalize(skillName));
-      const weight = detail?.importance === "core" ? 3 : detail?.importance === "supporting" ? 2 : 1;
-      score += weight;
+    const detail = skillDetails.find(x => normalize(x.name) === normalize(skillName));
+    const importance = detail?.importance || "core";
+    const weight = importance === "core" ? 3 : importance === "supporting" ? 2 : 1;
+    maxScore += weight;
+
+    const explicitMatch = explicitSkills.includes(normalize(skillName));
+    const evidenceRow = studentSkillEvidence.find(x => normalize(x.name || x.skill_name) === normalize(skillName));
+    const proficiency = Number(evidenceRow?.proficiency);
+    const evidenceMatch = Number.isFinite(proficiency) && proficiency >= 1;
+
+    if (explicitMatch || evidenceMatch || text.includes(normalize(skillName))) {
+      const proficiencyFactor = evidenceMatch ? Math.min(1, proficiency / 5) : 1;
+      score += weight * proficiencyFactor;
       matchedSkills.push(skillName);
-      evidence.push({ type: "skill", value: skillName, weight });
+      evidence.push({
+        type: "skill",
+        value: skillName,
+        importance,
+        weight,
+        proficiency: evidenceMatch ? proficiency : null,
+        source: evidenceRow?.source || null,
+        evidence: evidenceRow?.evidence || null
+      });
     } else {
       missingSkills.push(skillName);
     }
@@ -161,9 +183,12 @@ function scorePathway(pathway, profile) {
     }
   }
 
+  const skillMatchScore = maxScore ? Math.round((score / maxScore) * 70) : 0;
+
   return {
     ...pathway,
-    match_score: score,
+    match_score: Math.min(100, skillMatchScore + Math.min(30, score)),
+    skill_match_score: skillMatchScore,
     matched_skills: matchedSkills,
     skill_gaps: missingSkills.slice(0, 6),
     evidence
